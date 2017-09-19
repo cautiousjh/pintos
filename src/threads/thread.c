@@ -1,4 +1,3 @@
-//sample comment from windows OS
 #include "threads/thread.h"
 #include <debug.h>
 #include <stddef.h>
