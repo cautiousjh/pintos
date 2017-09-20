@@ -94,9 +94,11 @@ timer_wakeup(void)
 
   if(!list_empty(&sleep_list)){
     wakeup_thread = list_entry(list_front(&sleep_list), struct thread, elem);
-    wakeup_time = wakeup_thread->time_wakeup;
-    if(ticks>=wakeup_time)
-      thread_unblock(list_pop_front(&sleep_list));
+    wakeup_time = wakeup_thread->wakeup_time;
+    if(ticks>=wakeup_time){
+      list_pop_front(&sleep_list);
+      thread_unblock(wakeup_thread);
+    }
   }
 }
 
