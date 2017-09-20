@@ -84,16 +84,52 @@ timer_elapsed (int64_t then)
   return timer_ticks () - then;
 }
 
+/* (added)*/
+void
+timer_wakeup(void)
+{
+  struct thread* wakeup_thread;
+  int64_t wakeup_time;
+
+  if(!list_empty(&sleep_list)){
+    wakeup_thread = list_entry(list_front(&sleep_list), struct thread, elem);
+    wakeup_time = wakeup_tread->time_wakeup;
+    if(ticks>=wakeup_time)
+      thread_unblock(list_pop_front(&sleep_list));
+  }
+}
+
+bool 
+early_wakeup_aux_func (const struct list_elem* _a, 
+                       const struct list_elem* _b, 
+                       void* aux)
+{
+  const struct thread* a = _a;
+  const struct thread* b = _b;
+  return a->wakeup_time < b-> wakeup_time? true : false;
+}
+
 /* Sleeps for approximately TICKS timer ticks.  Interrupts must
    be turned on. */
 void
 timer_sleep (int64_t ticks) 
 {
   int64_t start = timer_ticks ();
+  struct thread* curr_thread = thread_current();
+  enum intr_level old_intr_level;
 
   ASSERT (intr_get_level () == INTR_ON);
-  while (timer_elapsed (start) < ticks) 
-    thread_yield ();
+  old_intr_level = intr_disable();
+
+  curr_thread->wakeup_time = start+ticks;
+
+  list_insert_ordered(&sleep_list, &curr_thread->elem, early_wakeup_aux_func, NULL);
+
+  thread_block();
+  intr_set_level(old_intr_level);
+
+  //while (timer_elapsed (start) < ticks) 
+  //  thread_yield ();
 }
 
 /* Sleeps for approximately MS milliseconds.  Interrupts must be
@@ -171,6 +207,7 @@ static void
 timer_interrupt (struct intr_frame *args UNUSED)
 {
   ticks++;
+  timer_wakeup();
   thread_tick ();
 }
 
