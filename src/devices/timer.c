@@ -19,7 +19,7 @@
 
 /* Number of timer ticks since OS booted. */
 static int64_t ticks;
-extern struct thread* sleep_list;
+extern struct list sleep_list;
 
 /* Number of loops per timer tick.
    Initialized by timer_calibrate(). */
@@ -94,7 +94,7 @@ timer_wakeup(void)
 
   if(!list_empty(&sleep_list)){
     wakeup_thread = list_entry(list_front(&sleep_list), struct thread, elem);
-    wakeup_time = wakeup_tread->time_wakeup;
+    wakeup_time = wakeup_thread->time_wakeup;
     if(ticks>=wakeup_time)
       thread_unblock(list_pop_front(&sleep_list));
   }
@@ -103,7 +103,7 @@ timer_wakeup(void)
 bool 
 early_wakeup_aux_func (const struct list_elem* _a, 
                        const struct list_elem* _b, 
-                       void* aux)
+                       void* aux UNUSED)
 {
   const struct thread* a = _a;
   const struct thread* b = _b;

@@ -15,7 +15,7 @@ int64_t timer_elapsed (int64_t);
 
 /*(added)*/
 void timer_wakeup (void);
-bool early_wakeup_aux_func (const struct list_elem*, const struct list_elem*, void*);
+static bool early_wakeup_aux_func (const struct list_elem*, const struct list_elem*, void*);
 /* Sleep and yield the CPU to other threads. */
 void timer_sleep (int64_t ticks);
 void timer_msleep (int64_t milliseconds);
