@@ -101,6 +101,7 @@ struct thread
     /* Owned by thread.c. */
     unsigned magic;                     /* Detects stack overflow. */
 
+    struct list_elem sleepElem;
     int64_t wakeup_time;               /* (added)when to wakeup */
   };
 
