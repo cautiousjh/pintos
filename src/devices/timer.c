@@ -215,7 +215,7 @@ timer_interrupt (struct intr_frame *args UNUSED)
 
 /* Returns true if LOOPS iterations waits for more than one timer
    tick, otherwise false. */
-static bool
+bool
 too_many_loops (unsigned loops) 
 {
   /* Wait for a timer tick. */
