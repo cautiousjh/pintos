@@ -100,7 +100,7 @@ timer_wakeup(void)
   }
 }
 
-bool 
+static bool 
 early_wakeup_aux_func (const struct list_elem* _a, 
                        const struct list_elem* _b, 
                        void* aux UNUSED)
