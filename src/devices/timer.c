@@ -20,6 +20,9 @@
 /* Number of timer ticks since OS booted. */
 static int64_t ticks;
 
+/* (added) list of sleeping processes */
+static struct list sleep_list;
+
 /* Number of loops per timer tick.
    Initialized by timer_calibrate(). */
 static unsigned loops_per_tick;
@@ -36,7 +39,8 @@ void
 timer_init (void) 
 {
   pit_configure_channel (0, 2, TIMER_FREQ);
-  intr_register_ext (0x20, timer_interrupt, "8254 Timer");
+  intr_register_ext (0x20, timer_interrupt, "8254 Timer");  
+  list_init (&sleep_list);
 }
 
 /* Calibrates loops_per_tick, used to implement brief delays. */
@@ -101,7 +105,7 @@ timer_wakeup(void)
   }
 }
 
-static bool 
+bool 
 early_wakeup_aux_func (const struct list_elem* _a, 
                        const struct list_elem* _b, 
                        void* aux UNUSED)
@@ -215,7 +219,7 @@ timer_interrupt (struct intr_frame *args UNUSED)
 
 /* Returns true if LOOPS iterations waits for more than one timer
    tick, otherwise false. */
-bool
+static bool
 too_many_loops (unsigned loops) 
 {
   /* Wait for a timer tick. */
