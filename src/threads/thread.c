@@ -511,7 +511,7 @@ priority_aux_func (const struct list_elem* _a,
 {
   const struct thread* a = list_entry(_a, struct thread, elem);
   const struct thread* b = list_entry(_b, struct thread, elem);
-  return a->priority < b-> priority? true : false;
+  return a->priority > b-> priority? true : false;
 }
 
 /* Completes a thread switch by activating the new thread's page
