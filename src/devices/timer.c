@@ -95,14 +95,16 @@ timer_wakeup(void)
   struct thread* wakeup_thread;
   int64_t wakeup_time;
 
-  if(!list_empty(&sleep_list)){
+  while(!list_empty(&sleep_list)){
     wakeup_thread = list_entry(list_front(&sleep_list), struct thread, sleepElem);
     wakeup_time = wakeup_thread->wakeup_time;
     if(ticks>=wakeup_time){
       list_pop_front(&sleep_list);
       thread_unblock(wakeup_thread);
     }
-  }
+    else
+      break;
+  }  
 }
 
 bool 
