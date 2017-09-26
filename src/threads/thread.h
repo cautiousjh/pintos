@@ -103,6 +103,10 @@ struct thread
 
     struct list_elem sleepElem;
     int64_t wakeup_time;               /* (added)when to wakeup */
+
+    bool isDonated;
+    int origin_priority;
+    struct thread* donee;
   };
 
 /* If false (default), use round-robin scheduler.

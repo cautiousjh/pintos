@@ -346,14 +346,20 @@ thread_foreach (thread_action_func *func, void *aux)
 void
 thread_set_priority (int new_priority) 
 {
+  int highest_priority;
   thread_current ()->priority = new_priority;
+  list_sort (&ready_list, priority_aux_func, NULL);
+  highest_priority = list_entry(list_head(&ready_list), struct thread, elem)->priority;
+  if(new_priority < highest_priority)
+    thread_yield();
 }
 
 /* Returns the current thread's priority. */
 int
 thread_get_priority (void) 
 {
-  return thread_current ()->priority;
+  struct thread* t = thread_current();
+  return t->isDonated? t->origin_priority : t->priority;
 }
 
 /* Sets the current thread's nice value to NICE. */
@@ -472,6 +478,7 @@ init_thread (struct thread *t, const char *name, int priority)
   t->stack = (uint8_t *) t + PGSIZE;
   t->priority = priority;
   t->magic = THREAD_MAGIC;
+  t->isDonated = false;
   list_push_back (&all_list, &t->allelem);
 }
 
@@ -511,7 +518,7 @@ priority_aux_func (const struct list_elem* _a,
 {
   const struct thread* a = list_entry(_a, struct thread, elem);
   const struct thread* b = list_entry(_b, struct thread, elem);
-  return a->priority > b-> priority? true : false;
+  return a->priority > b-> priority;
 }
 
 /* Completes a thread switch by activating the new thread's page
