@@ -524,7 +524,7 @@ thread_change(void)
   if(!list_empty(&ready_list)){
     list_sort (&ready_list, priority_aux_func, NULL);
     highest_priority = list_entry(list_back(&ready_list), struct thread, elem)->priority;
-    if(new_priority < highest_priority)
+    if(current_thread()->priority < highest_priority)
       thread_yield();
   }
   intr_set_level (old_level);
