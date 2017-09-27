@@ -520,14 +520,12 @@ void
 thread_change(void)
 {
   int highest_priority;
-  enum intr_level old_level = intr_disable ();
   if(!list_empty(&ready_list)){
     list_sort (&ready_list, priority_aux_func, NULL);
     highest_priority = list_entry(list_back(&ready_list), struct thread, elem)->priority;
     if(thread_current()->priority < highest_priority)
       thread_yield();
   }
-  intr_set_level (old_level);
 }
 
 /* Completes a thread switch by activating the new thread's page
