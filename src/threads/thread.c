@@ -502,7 +502,7 @@ next_thread_to_run (void)
   if (list_empty (&ready_list))
     return idle_thread;
   else{
-    thread_change ();
+    return list_entry(list_pop_back(&ready_list), struct thread, elem);
   }
 }
 
