@@ -345,9 +345,7 @@ thread_foreach (thread_action_func *func, void *aux)
 void
 thread_set_priority (int new_priority) 
 {
-  int highest_priority;
   thread_current ()->priority = new_priority;
-
   therad_change();
 }
 
@@ -521,6 +519,7 @@ priority_aux_func (const struct list_elem* _a,
 void
 thread_change(void)
 {
+  int highest_priority;
   enum intr_level old_level = intr_disable ();
   if(!list_empty(&ready_list)){
     list_sort (&ready_list, priority_aux_func, NULL);
