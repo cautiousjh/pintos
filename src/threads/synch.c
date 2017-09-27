@@ -201,9 +201,9 @@ lock_acquire (struct lock *lock)
   struct thread* holding_thread = lock->holder;
   struct thread* curr_thread = thread_current();
 
-  while(holding_thread != NULL && holding_thread->priority < curr_thread->priority){
+ //while(holding_thread != NULL && holding_thread->priority < curr_thread->priority){
     //priority donation
-  }
+  //}
     
 
   sema_down (&lock->semaphore);
