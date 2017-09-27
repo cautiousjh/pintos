@@ -348,12 +348,7 @@ thread_set_priority (int new_priority)
   int highest_priority;
   thread_current ()->priority = new_priority;
 
-  if(!list_empty(&ready_list)){
-    list_sort (&ready_list, priority_aux_func, NULL);
-    highest_priority = list_entry(list_back(&ready_list), struct thread, elem)->priority;
-    if(new_priority < highest_priority)
-      thread_yield();
-  }
+  therad_change();
 }
 
 /* Returns the current thread's priority. */
@@ -527,9 +522,10 @@ void
 thread_change(void)
 {
   enum intr_level old_level = intr_disable ();
-  if (!list_empty (&ready_list)){
+  if(!list_empty(&ready_list)){
     list_sort (&ready_list, priority_aux_func, NULL);
-    if(thread_current()->priority < list_back (&ready_list)->priority)
+    highest_priority = list_entry(list_back(&ready_list), struct thread, elem)->priority;
+    if(new_priority < highest_priority)
       thread_yield();
   }
   intr_set_level (old_level);
