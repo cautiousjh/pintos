@@ -209,8 +209,10 @@ thread_create (const char *name, int priority,
   /* Add to run queue. */
   thread_unblock (t);
 
-  if(priority > thread_current()->priority)
+  if(priority > thread_current()->priority){
+    printf("Thread yield\n");
     thread_yield();
+  }
 
   return tid;
 }
@@ -482,6 +484,7 @@ init_thread (struct thread *t, const char *name, int priority)
   t->priority = priority;
   t->magic = THREAD_MAGIC;
   t->isDonated = false;
+  list_init (&t->lock_list);
   list_push_back (&all_list, &t->allelem);
 }
 

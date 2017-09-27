@@ -107,6 +107,7 @@ struct thread
     bool isDonated;
     int origin_priority;
     struct thread* donee;
+    struct list* lock_list;
   };
 
 /* If false (default), use round-robin scheduler.
