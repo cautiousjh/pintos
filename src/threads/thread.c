@@ -349,10 +349,12 @@ thread_set_priority (int new_priority)
   int highest_priority;
   thread_current ()->priority = new_priority;
 
-  list_sort (&ready_list, priority_aux_func, NULL);
-  highest_priority = list_entry(list_back(&ready_list), struct thread, elem)->priority;
-  if(new_priority < highest_priority)
-    thread_yield();
+  if(!list_empty(&ready_list)){
+    list_sort (&ready_list, priority_aux_func, NULL);
+    highest_priority = list_entry(list_back(&ready_list), struct thread, elem)->priority;
+    if(new_priority < highest_priority)
+      thread_yield();
+  }
 }
 
 /* Returns the current thread's priority. */
