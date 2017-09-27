@@ -209,10 +209,7 @@ thread_create (const char *name, int priority,
   /* Add to run queue. */
   thread_unblock (t);
 
-  if(priority > thread_current()->priority){
-    printf("current priority:%d, priority: %d, Thread yield\n",thread_current()->priority,priority);
-    thread_yield();
-  }
+  thread_change ();
 
   return tid;
 }
@@ -512,8 +509,7 @@ next_thread_to_run (void)
   if (list_empty (&ready_list))
     return idle_thread;
   else{
-    list_sort (&ready_list, priority_aux_func, NULL);
-    return list_entry (list_pop_back (&ready_list), struct thread, elem);
+    thread_change ();
   }
 }
 
@@ -525,6 +521,18 @@ priority_aux_func (const struct list_elem* _a,
   const struct thread* a = list_entry(_a, struct thread, elem);
   const struct thread* b = list_entry(_b, struct thread, elem);
   return a->priority < b-> priority;
+}
+
+void
+thread_change(void)
+{
+  enum intr_level old_level = intr_disable ();
+  if (!list_empty (&ready_list)){
+    list_sort (&ready_list, priority_aux_func, NULL);
+    if(thread_current()->priority < list_back (&ready_list)->priority)
+      thread_yield();
+  }
+  intr_set_level (old_level);
 }
 
 /* Completes a thread switch by activating the new thread's page

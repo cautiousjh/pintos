@@ -149,4 +149,5 @@ int thread_get_load_avg (void);
 bool priority_aux_func (const struct list_elem* _a, 
                         const struct list_elem* _b, 
                         void* aux UNUSED);
+void thread_change (void);
 #endif /* threads/thread.h */
