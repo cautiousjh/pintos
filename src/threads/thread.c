@@ -210,7 +210,7 @@ thread_create (const char *name, int priority,
   thread_unblock (t);
 
   if(priority > thread_current()->priority){
-    printf("Thread yield\n");
+    printf("current priority:%d, priority: %d, Thread yield\n",thread_current()->priority,priority);
     thread_yield();
   }
 
