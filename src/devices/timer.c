@@ -114,7 +114,7 @@ early_wakeup_aux_func (const struct list_elem* _a,
 {
   const struct thread* a = list_entry(_a, struct thread, sleepElem);
   const struct thread* b = list_entry(_b, struct thread, sleepElem);
-  return a->wakeup_time < b-> wakeup_time? true : false;
+  return a->wakeup_time < b-> wakeup_time;
 }
 
 /* Sleeps for approximately TICKS timer ticks.  Interrupts must
