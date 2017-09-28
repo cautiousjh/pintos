@@ -367,11 +367,15 @@ donate_priority (struct thread *thread){
   // while there's no lock waiting with certain depth
   while(thread->waitlock!=NULL){
     thread->waitlock->donate_priority = thread->priority;
-    // selectproper priority
-    list_sort(&thread->lock_list,lock_priority_aux_func,NULL);
-    lock_priority = list_entry(list_front(&thread->lock_list), struct lock, lockElem)->donate_priority;
-    if(lock_priority > thread->origin_priority)
-      holder->priority = lock_priority;
+    // select proper priority
+    if(!list_empty(&thread->lock_list)){
+      list_sort(&thread->lock_list,lock_priority_aux_func,NULL);
+      lock_priority = list_entry(list_front(&thread->lock_list), struct lock, lockElem)->donate_priority;
+      if(lock_priority > thread->origin_priority)
+        holder->priority = lock_priority;
+      else
+        holder->priority = thread->origin_priority;
+    }
     else
       holder->priority = thread->origin_priority;
     //iteration
