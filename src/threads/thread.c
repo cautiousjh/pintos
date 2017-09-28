@@ -369,11 +369,11 @@ donate_priority (struct thread *thread){
     thread->waitlock->donate_priority = thread->priority;
     // selectproper priority
     list_sort(&thread->lock_list,lock_priority_aux_func,NULL);
-    lock_priority = list_entry(list_front(&curr_thread->lock_list), struct lock, lockElem)->donate_priority;
-    if(lock_priority > curr_thread->origin_priority)
+    lock_priority = list_entry(list_front(&thread->lock_list), struct lock, lockElem)->donate_priority;
+    if(lock_priority > thread->origin_priority)
       holder->priority = lock_priority;
     else
-      holder->priority = curr_thread->origin_priority;
+      holder->priority = thread->origin_priority;
     //iteration
     thread = holder;
     holder = thread->waitlock->holder;
