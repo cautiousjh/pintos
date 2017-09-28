@@ -268,9 +268,9 @@ lock_priority_aux_func (const struct list_elem* _a,
                       const struct list_elem* _b, 
                       void* aux UNUSED)
 {
-  const struct thread* a = list_entry(_a, struct lock, lockElem);
-  const struct thread* b = list_entry(_b, struct lock, lockElem);
-  return a->priority > b-> priority;
+  const struct lock* a = list_entry(_a, struct lock, lockElem);
+  const struct lock* b = list_entry(_b, struct lock, lockElem);
+  return a->donate_priority > b-> donate_priority;
 }
 
 /* Returns true if the current thread holds LOCK, false
