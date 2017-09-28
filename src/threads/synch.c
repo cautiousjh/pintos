@@ -283,8 +283,8 @@ condvar_priority_aux_func(const struct list_elem* _a,
                       const struct list_elem* _b, 
                       void* aux UNUSED)
 {
-  const struct list_elem a = list_entry(_a,struct semaphore_elem,elem);
-  const struct list_elem b = list_entry(_b,struct semaphore_elem,elem);
+  const struct semaphore_elem* a = list_entry(_a,struct semaphore_elem,elem);
+  const struct semaphore_elem* b = list_entry(_b,struct semaphore_elem,elem);
   return list_entry(list_begin(&a->semaphore.waiters),struct thread,elem)->priority >
           list_entry(list_begin(&b->semaphore.waiters),struct thread,elem)->priority
 }
