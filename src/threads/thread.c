@@ -362,19 +362,21 @@ thread_get_priority (void)
 
 void 
 donate_priority (struct thread *thread){
-  int depth=0;
+  int lock_priority;
   struct thread* holder = thread->waitlock->holder;
   // while there's no lock waiting with certain depth
-  while(thread->waitlock!=NULL && holder!=NULL && depth<DEPTH_LIMIT){
+  while(thread->waitlock!=NULL){
     thread->waitlock->donate_priority = thread->priority;
-    if(holder->priority < thread->priority){
-      holder->priority = thread->priority;
-      //iteration
-      depth++;
-      thread = holder;
-    }
+    // selectproper priority
+    list_sort(&thread->lock_list,lock_priority_aux_func,NULL);
+    lock_priority = list_entry(list_front(&curr_thread->lock_list), struct lock, lockElem)->donate_priority;
+    if(lock_priority > curr_thread->origin_priority)
+      holder->priority = lock_priority;
     else
-      return;
+      holder->priority = curr_thread->origin_priority;
+    //iteration
+    thread = holder;
+    holder = thread->waitlock->holder;
   } 
 }
 
