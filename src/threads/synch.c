@@ -302,11 +302,18 @@ condvar_priority_aux_func(const struct list_elem* _a,
                       const struct list_elem* _b, 
                       void* aux UNUSED)
 {
+  struct list_elem *aw=list_begin(&list_entry(
+    _a,struct semaphore_elem,elem)->semaphore.waiters);
+  struct list_elem *bw=list_begin(&list_entry(
+    _b,struct semaphore_elem,elem)->semaphore.waiters);
+  return list_entry(aw,struct thread,elem)->priority>list_entry(bw,
+  struct thread,elem)->priority;
+  /*
   struct semaphore_elem* a = list_entry(_a,struct semaphore_elem,elem);
   struct semaphore_elem* b = list_entry(_b,struct semaphore_elem,elem);
   return list_entry(list_begin(&a->semaphore.waiters),struct thread,elem)->priority >
           list_entry(list_begin(&b->semaphore.waiters),struct thread,elem)->priority;
-}
+*/}
 
 /* Initializes condition variable COND.  A condition variable
    allows one piece of code to signal a condition and cooperating
