@@ -200,13 +200,11 @@ lock_acquire (struct lock *lock)
 
   struct thread* curr_thread = thread_current();
 
-  if(lock_try_acquire(lock))
-    return;
-  else{ //some other thread holds the lock
+  if(lock->holder){//some other thread holds the lock
     curr_thread->waitlock = lock;
     list_push_back (&lock->holder->donation_list, &curr_thread->donateElem);
-    donate_priority(curr_thread);   
-  }  
+    donate_priority(curr_thread);    
+  }
   sema_down (&lock->semaphore);
   curr_thread->waitlock = NULL;
   lock->holder = curr_thread;  
@@ -256,7 +254,6 @@ lock_release (struct lock *lock) {
     if(list_entry(e,struct thread, donateElem)->waitlock == lock)
       list_remove(e);
   
-
   // reset priority
   if(list_empty(&thread_current()->donation_list))
     thread_current()->priority = thread_current()->origin_priority;
@@ -271,9 +268,6 @@ lock_release (struct lock *lock) {
   sema_up (&lock->semaphore);
   intr_set_level (old_level);
 }
-
-
-
 
 /* Returns true if the current thread holds LOCK, false
    otherwise.  (Note that testing whether some other thread holds
