@@ -363,9 +363,10 @@ thread_get_priority (void)
 void 
 donate_priority (struct thread *thread){
   int lock_priority=0;
-  struct thread* holder = thread->waitlock->holder;
+  struct thread* holder;
   // while there's no lock waiting
   while(thread->waitlock!=NULL){
+    holder = thread->waitlock->holder;
     thread->waitlock->donate_priority = thread->priority;
     // select proper priority
     if(!list_empty(&thread->lock_list)){
@@ -380,9 +381,7 @@ donate_priority (struct thread *thread){
       holder->priority = thread->origin_priority;
     //iteration
     thread = holder;
-    holder = thread->waitlock->holder;
   }
-
 }
 
 /* Sets the current thread's nice value to NICE. */

@@ -205,9 +205,9 @@ lock_acquire (struct lock *lock)
     donate_priority(curr_thread);    
   }
   sema_down (&lock->semaphore);
-  curr_thread->waitlock = NULL;
   lock->holder = curr_thread;  
   list_push_back (&curr_thread->lock_list, &lock->lockElem);
+  curr_thread->waitlock = NULL;
 }
 
 /* Tries to acquires LOCK and returns true if successful or false
