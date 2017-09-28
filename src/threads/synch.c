@@ -278,6 +278,16 @@ lock_priority_aux_func (const struct list_elem* _a,
   const struct lock* b = list_entry(_b, struct lock, lockElem);
   return a->donate_priority > b-> donate_priority;
 }
+bool
+condvar_priority_aux_func(const struct list_elem* _a, 
+                      const struct list_elem* _b, 
+                      void* aux UNUSED)
+{
+  const struct list_elem a = list_entry(_a,struct semaphore_elem,elem);
+  const struct list_elem b = list_entry(_b,struct semaphore_elem,elem);
+  return list_entry(list_begin(&a->semaphore.waiters),struct thread,elem)->priority >
+          list_entry(list_begin(&b->semaphore.waiters),struct thread,elem)->priority
+}
 
 /* Returns true if the current thread holds LOCK, false
    otherwise.  (Note that testing whether some other thread holds
@@ -361,7 +371,7 @@ cond_signal (struct condition *cond, struct lock *lock UNUSED)
   ASSERT (lock_held_by_current_thread (lock));
 
   if (!list_empty (&cond->waiters)) {
-    list_sort (&cond->waiters, priority_aux_func, NULL);
+    list_sort (&cond->waiters, condvar_priority_aux_func, NULL);
     sema_up (&list_entry (list_pop_front (&cond->waiters),
                           struct semaphore_elem, elem)->semaphore);
   }
