@@ -241,6 +241,7 @@ lock_try_acquire (struct lock *lock)
 void
 lock_release (struct lock *lock) {
   struct list_elem *e;
+  struct thread* curr_thread = thread_current();
 
   ASSERT (lock != NULL);
   ASSERT (lock_held_by_current_thread (lock));
@@ -248,20 +249,20 @@ lock_release (struct lock *lock) {
   enum intr_level old_level = intr_disable();
 
   // remove lock from thread's donation_list
-  for (e = list_begin (&thread_current()->donation_list);
-       e != list_end (&thread_current()->donation_list);
+  for (e = list_begin (&curr_thread->donation_list);
+       e != list_end (&curr_thread->donation_list);
        e = list_next (e))
     if(list_entry(e,struct thread, donateElem)->waitlock == lock)
       list_remove(e);
   
   // reset priority
-  if(list_empty(&thread_current()->donation_list))
-    thread_current()->priority = thread_current()->origin_priority;
+  if(list_empty(&curr_thread->donation_list))
+    curr_thread->priority = curr_thread->origin_priority;
   else{
-    struct thread* max_thread = list_entry(list_max(&thread_current()->donation_list, priority_aux_func, NULL), 
+    struct thread* max_thread = list_entry(list_max(&curr_thread->donation_list, priority_aux_func, NULL), 
       struct thread, donateElem);
-    if(max_thread->priority > thread_current()->priority)
-      thread_current()->priority = max_thread->priority;
+    if(max_thread->priority > curr_thread->priority)
+      curr_thread->priority = max_thread->priority;
   }
 
   lock->holder = NULL;
