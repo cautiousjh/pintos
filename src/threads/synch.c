@@ -278,16 +278,6 @@ lock_priority_aux_func (const struct list_elem* _a,
   const struct lock* b = list_entry(_b, struct lock, lockElem);
   return a->donate_priority > b-> donate_priority;
 }
-bool
-condvar_priority_aux_func(const struct list_elem* _a, 
-                      const struct list_elem* _b, 
-                      void* aux UNUSED)
-{
-  const struct semaphore_elem* a = list_entry(_a,struct semaphore_elem,elem);
-  const struct semaphore_elem* b = list_entry(_b,struct semaphore_elem,elem);
-  return list_entry(list_begin(&a->semaphore.waiters),struct thread,elem)->priority >
-          list_entry(list_begin(&b->semaphore.waiters),struct thread,elem)->priority
-}
 
 /* Returns true if the current thread holds LOCK, false
    otherwise.  (Note that testing whether some other thread holds
@@ -306,6 +296,17 @@ struct semaphore_elem
     struct list_elem elem;              /* List element. */
     struct semaphore semaphore;         /* This semaphore. */
   };
+
+bool
+condvar_priority_aux_func(const struct list_elem* _a, 
+                      const struct list_elem* _b, 
+                      void* aux UNUSED)
+{
+  const struct semaphore_elem* a = list_entry(_a,struct semaphore_elem,elem);
+  const struct semaphore_elem* b = list_entry(_b,struct semaphore_elem,elem);
+  return list_entry(list_begin(&a->semaphore.waiters),struct thread,elem)->priority >
+          list_entry(list_begin(&b->semaphore.waiters),struct thread,elem)->priority
+}
 
 /* Initializes condition variable COND.  A condition variable
    allows one piece of code to signal a condition and cooperating
