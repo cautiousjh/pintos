@@ -107,6 +107,7 @@ struct thread
     bool isDonated;
     int origin_priority;
 
+    struct list_elem donateElem;
     struct list donation_list;
     struct list lock_list;
     struct lock* waitlock;
