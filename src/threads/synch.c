@@ -258,6 +258,8 @@ lock_release (struct lock *lock) {
     if(lock_priority < curr_thread->priority)
       curr_thread->priority = lock_priority;
   }
+  else
+    curr_thread->priority = curr_thread->origin_priority;
   lock->holder = NULL;
   sema_up (&lock->semaphore);
   intr_set_level (old_level);
