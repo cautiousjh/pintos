@@ -259,7 +259,7 @@ lock_release (struct lock *lock) {
 
   // reset priority
   if(list_empty(&thread_current()->donation_list))
-    thread_current()->priority = thread_current->origin_priority;
+    thread_current()->priority = thread_current()->origin_priority;
   else{
     struct thread* max_thread = list_entry(list_max(&thread_current()->donation_list, priority_aux_func, NULL), 
       struct thread, donateElem);
