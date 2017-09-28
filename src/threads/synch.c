@@ -256,9 +256,8 @@ lock_release (struct lock *lock) {
     list_sort(&curr_thread->lock_list,lock_priority_aux_func,NULL);
     lock_priority = list_entry(list_front(&curr_thread->lock_list), struct lock, lockElem)->donate_priority;
     if(lock_priority > curr_thread->origin_priority)
-      curr_thread->priority = lock_priority;
-    else
       curr_thread->priority = curr_thread->origin_priority;
+      //curr_thread->priority = lock_priority;
   }
   else
     curr_thread->priority = curr_thread->origin_priority;
