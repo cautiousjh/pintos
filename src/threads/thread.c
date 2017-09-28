@@ -377,10 +377,9 @@ donate_priority (struct thread *thread){
   } 
 }
 
-void
-update_priority(struct thread* thread){
-  if(thread->priority < cur-)
-}
+//void
+//update_priority(struct thread* thread){
+//}
 
 /* Sets the current thread's nice value to NICE. */
 void
