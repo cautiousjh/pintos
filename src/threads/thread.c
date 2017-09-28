@@ -354,12 +354,32 @@ int
 thread_get_priority (void) 
 {
   struct thread* t = thread_current();
-  return t->isDonated? t->origin_priority : t->priority;
+  return t->priority;
 }
 
 void 
 donate_priority (struct thread *thread){
+  int depth=0;
+  struct thread* holder = thread->waitlock->holder;
+  // while there's no lock waiting with certain depth
+  while(thread->waitlock!=NULL && holder!=NULL && depth<DEPTH_LIMIT){
+    if(holder->priority < thread->priority){
+      holder->origin_priority = holder->priority;
+      holder->priority = thread->priority;
 
+      //iteration
+      depth++;
+      thread = holder;
+      thread->waitlock = thread->waitlock;
+    }
+    else
+      return;
+  } 
+}
+
+void
+update_priority(struct thread* thread){
+  if(thread->priority < cur-)
 }
 
 /* Sets the current thread's nice value to NICE. */
@@ -479,6 +499,7 @@ init_thread (struct thread *t, const char *name, int priority)
   t->priority = priority;
   t->magic = THREAD_MAGIC;
   t->isDonated = false;
+  t-> waitlock = NULL;
   list_init (&t->lock_list);
   list_init (&t->donation_list);
   list_push_back (&all_list, &t->allelem);
