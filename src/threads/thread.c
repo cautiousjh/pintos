@@ -362,12 +362,11 @@ thread_get_priority (void)
 
 void 
 donate_priority (struct thread *thread){
-  int depth=0;
+  int lock_priority=0;
   struct thread* holder = thread->waitlock->holder;
-  // while there's no lock waiting with certain depth
-  while(thread->waitlock!=NULL && holder!=NULL && depth<DEPTH_LIMIT){
+  // while there's no lock waiting
+  while(thread->waitlock!=NULL){
     thread->waitlock->donate_priority = thread->priority;
-<<<<<<< HEAD
     // select proper priority
     if(!list_empty(&thread->lock_list)){
       list_sort(&thread->lock_list,lock_priority_aux_func,NULL);
@@ -382,17 +381,8 @@ donate_priority (struct thread *thread){
     //iteration
     thread = holder;
     holder = thread->waitlock->holder;
-=======
-    if(holder->priority < thread->priority){
-      holder->priority = thread->priority;
-      //iteration
-      depth++;
-      thread = holder;
-    }
-    else
-      return;
->>>>>>> parent of b67797e... asdf
-  } 
+  }
+
 }
 
 /* Sets the current thread's nice value to NICE. */
@@ -515,7 +505,6 @@ init_thread (struct thread *t, const char *name, int priority)
   t->isDonated = false;
   t-> waitlock = NULL;
   list_init (&t->lock_list);
-  list_init (&t->donation_list);
   list_push_back (&all_list, &t->allelem);
 }
 

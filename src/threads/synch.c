@@ -202,7 +202,6 @@ lock_acquire (struct lock *lock)
 
   if(lock->holder){//some other thread holds the lock
     curr_thread->waitlock = lock;
-    list_push_back (&lock->holder->donation_list, &curr_thread->donateElem);
     donate_priority(curr_thread);    
   }
   sema_down (&lock->semaphore);
