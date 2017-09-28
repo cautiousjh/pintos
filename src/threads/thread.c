@@ -370,7 +370,7 @@ donate_priority (struct thread *thread){
     // select proper priority
     if(!list_empty(&thread->lock_list)){
       list_sort(&thread->lock_list,lock_priority_aux_func,NULL);
-      lock_priority = list_entry(list_front(&thread->lock_list), struct lock, lockElem)->donate_priority;
+      lock_priority = list_entry(list_begin(&thread->lock_list), struct lock, lockElem)->donate_priority;
       if(lock_priority > thread->origin_priority)
         holder->priority = lock_priority;
       else
