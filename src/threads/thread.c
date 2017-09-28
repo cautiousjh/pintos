@@ -366,6 +366,7 @@ donate_priority (struct thread *thread){
   struct thread* holder = thread->waitlock->holder;
   // while there's no lock waiting with certain depth
   while(thread->waitlock!=NULL && holder!=NULL && depth<DEPTH_LIMIT){
+    thread->waitlock->donate_priority = thread->priority;
     if(holder->priority < thread->priority){
       holder->priority = thread->priority;
       //iteration

@@ -240,6 +240,7 @@ lock_try_acquire (struct lock *lock)
    handler. */
 void
 lock_release (struct lock *lock) {
+  int lock_priority;
   struct list_elem *e;
   struct thread* curr_thread = thread_current();
 
@@ -248,26 +249,26 @@ lock_release (struct lock *lock) {
 
   enum intr_level old_level = intr_disable();
 
-  // remove lock from thread's donation_list
-  for (e = list_begin (&curr_thread->donation_list);
-       e != list_end (&curr_thread->donation_list);
-       e = list_next (e))
-    if(list_entry(e,struct thread, donateElem)->waitlock == lock)
-      list_remove(e);
-  
+  // remove lock from thread's list
+  list_remove(&lock->lockElem);  
   // reset priority
-  if(list_empty(&curr_thread->donation_list))
-    curr_thread->priority = curr_thread->origin_priority;
-  else{
-    struct thread* max_thread = list_entry(list_max(&curr_thread->donation_list, priority_aux_func, NULL), 
-      struct thread, donateElem);
-    if(max_thread->priority > curr_thread->priority)
-      curr_thread->priority = max_thread->priority;
-  }
+  list_sort(curr_thread->lock_list,lock_priority_aux_func,NULL);
+  lock_priority = list_entry(list_front(&curr_thread->lock_list), struct lock, lockElem)->donate_priority;
+  return curr_thread->priority>lock_priority ? curr_thread->priority : lock_priority;
 
   lock->holder = NULL;
   sema_up (&lock->semaphore);
   intr_set_level (old_level);
+}
+
+bool 
+lock_priority_aux_func (const struct list_elem* _a, 
+                      const struct list_elem* _b, 
+                      void* aux UNUSED)
+{
+  const struct thread* a = list_entry(_a, struct lock, elem);
+  const struct thread* b = list_entry(_b, struct lock, elem);
+  return a->priority > b-> priority;
 }
 
 /* Returns true if the current thread holds LOCK, false
