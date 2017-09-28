@@ -248,7 +248,7 @@ lock_release (struct lock *lock) {
   // remove lock from thread's list
   list_remove(&lock->lockElem);
   // reset priority
-  if(!list_empty(&curr_thread->lock_list)){
+  /*if(!list_empty(&curr_thread->lock_list)){
     list_sort(&curr_thread->lock_list,lock_priority_aux_func,NULL);
     lock_priority = list_entry(list_front(&curr_thread->lock_list), struct lock, lockElem)->donate_priority;
     if(lock_priority > curr_thread->origin_priority)
@@ -256,7 +256,7 @@ lock_release (struct lock *lock) {
     else
       curr_thread->priority = curr_thread->origin_priority;
   }
-  else
+  else*/
     curr_thread->priority = curr_thread->origin_priority;
   
   lock->holder = NULL;
