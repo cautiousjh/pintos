@@ -250,7 +250,7 @@ lock_release (struct lock *lock) {
   enum intr_level old_level = intr_disable();
 
   // remove lock from thread's donation_list
-  for (e = list_begin (&thread_current()->donation_list;
+  for (e = list_begin (&thread_current()->donation_list);
        e != list_end (&thread_current()->donation_list);
        e = list_next (e))
     if(list_entry(e,struct thread, donateElem)->waitlock == lock)
