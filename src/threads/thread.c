@@ -345,10 +345,20 @@ thread_foreach (thread_action_func *func, void *aux)
 void
 thread_set_priority (int new_priority) 
 {
-  int old_priority = thread_current ()->priority;
-  thread_current ()->priority = new_priority;
-  if(old_priority < new_priority)
-    donate_priority(thread_current());
+  struct thread* curr_thread = thread_current();
+  curr_thread->origin_priority = new_priority;
+  // reset priority
+  if(!list_empty(&curr_thread->lock_list)){
+    list_sort(&curr_thread->lock_list,lock_priority_aux_func,NULL);
+    lock_priority = list_entry(list_front(&curr_thread->lock_list), struct lock, lockElem)->donate_priority;
+    if(lock_priority > curr_thread->origin_priority)
+      curr_thread->priority = lock_priority;
+    else
+      curr_thread->priority = curr_thread->origin_priority;
+  }
+  else
+    curr_thread->priority = curr_thread->origin_priority;
+  // thread change
   thread_change();
 }
 
