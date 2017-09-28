@@ -252,10 +252,12 @@ lock_release (struct lock *lock) {
   // remove lock from thread's list
   list_remove(&lock->lockElem);  
   // reset priority
-  list_sort(&curr_thread->lock_list,lock_priority_aux_func,NULL);
-  lock_priority = list_entry(list_front(&curr_thread->lock_list), struct lock, lockElem)->donate_priority;
-  return curr_thread->priority>lock_priority ? curr_thread->priority : lock_priority;
-
+  if(!list_empty(&curr_thread->lock_list)){
+    list_sort(&curr_thread->lock_list,lock_priority_aux_func,NULL);
+    lock_priority = list_entry(list_front(&curr_thread->lock_list), struct lock, lockElem)->donate_priority;
+    if(lock_priority < curr_thread->priority)
+      curr_thread->priority = lock_priority;
+  }
   lock->holder = NULL;
   sema_up (&lock->semaphore);
   intr_set_level (old_level);
