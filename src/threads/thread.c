@@ -357,7 +357,6 @@ int
 thread_get_priority (void) 
 {
   struct thread* t = thread_current();
-  printf("%d\n",t->priority);
   return t->priority;
 }
 
