@@ -527,7 +527,7 @@ next_thread_to_run (void)
     return idle_thread;
   else{
     list_sort (&ready_list, priority_aux_func, NULL);
-    return list_entry(list_pop_back(&ready_list), struct thread, elem);
+    return list_entry(list_pop_front(&ready_list), struct thread, elem);
   }
 }
 
@@ -538,7 +538,7 @@ priority_aux_func (const struct list_elem* _a,
 {
   const struct thread* a = list_entry(_a, struct thread, elem);
   const struct thread* b = list_entry(_b, struct thread, elem);
-  return a->priority < b-> priority;
+  return a->priority > b-> priority;
 }
 
 void
@@ -547,7 +547,7 @@ thread_change(void)
   int highest_priority;
   if(!list_empty(&ready_list)){
     list_sort (&ready_list, priority_aux_func, NULL);
-    highest_priority = list_entry(list_back(&ready_list), struct thread, elem)->priority;
+    highest_priority = list_entry(list_front(&ready_list), struct thread, elem)->priority;
     if(thread_current()->priority < highest_priority)
       thread_yield();
   }
