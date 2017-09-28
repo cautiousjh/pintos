@@ -84,7 +84,7 @@ struct thread
   {
     /* Owned by thread.c. */
     tid_t tid;                          /* Thread identifier. */
-    enum thread_status status;          /* Thread state. */
+    enum thread_status status;          /* Thread state. */ 
     char name[16];                      /* Name (for debugging purposes). */
     uint8_t *stack;                     /* Saved stack pointer. */
     int priority;                       /* Priority. */
@@ -106,8 +106,10 @@ struct thread
 
     bool isDonated;
     int origin_priority;
-    struct thread* donee;
-    struct list* lock_list;
+
+    struct list donation_list;
+    struct list lock_list;
+    struct lock* waitlock;
   };
 
 /* If false (default), use round-robin scheduler.
@@ -140,6 +142,8 @@ void thread_foreach (thread_action_func *, void *);
 
 int thread_get_priority (void);
 void thread_set_priority (int);
+
+void donate_priority(struct thread *);
 
 int thread_get_nice (void);
 void thread_set_nice (int);

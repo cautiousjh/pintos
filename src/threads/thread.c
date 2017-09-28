@@ -92,6 +92,8 @@ thread_init (void)
   lock_init (&tid_lock);
   list_init (&ready_list);
   list_init (&all_list);
+  list_init (&lock_list);
+  list_init (&donation_list);
 
   /* Set up a thread structure for the running thread. */
   initial_thread = running_thread ();
@@ -357,6 +359,11 @@ thread_get_priority (void)
   return t->isDonated? t->origin_priority : t->priority;
 }
 
+void 
+donate_priority (struct thread *thread){
+
+}
+
 /* Sets the current thread's nice value to NICE. */
 void
 thread_set_nice (int nice UNUSED) 
@@ -474,7 +481,6 @@ init_thread (struct thread *t, const char *name, int priority)
   t->priority = priority;
   t->magic = THREAD_MAGIC;
   t->isDonated = false;
-  list_init (&t->lock_list);
   list_push_back (&all_list, &t->allelem);
 }
 
@@ -502,6 +508,7 @@ next_thread_to_run (void)
   if (list_empty (&ready_list))
     return idle_thread;
   else{
+    list_sort (&ready_list, priority_aux_func, NULL);
     return list_entry(list_pop_back(&ready_list), struct thread, elem);
   }
 }
