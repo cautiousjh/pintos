@@ -372,7 +372,6 @@ donate_priority (struct thread *thread){
       //iteration
       depth++;
       thread = holder;
-      thread->waitlock = thread->waitlock;
     }
     else
       return;
