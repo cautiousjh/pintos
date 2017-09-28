@@ -117,6 +117,7 @@ sema_up (struct semaphore *sema)
     list_sort (&sema->waiters, priority_aux_func, NULL);
     thread_unblock (list_entry (list_pop_back (&sema->waiters),
                                 struct thread, elem));
+    thread_yield();
   }
   sema->value++;
   intr_set_level (old_level);
@@ -248,7 +249,7 @@ lock_release (struct lock *lock) {
   // remove lock from thread's list
   list_remove(&lock->lockElem);
   // reset priority
-  /*if(!list_empty(&curr_thread->lock_list)){
+  if(!list_empty(&curr_thread->lock_list)){
     list_sort(&curr_thread->lock_list,lock_priority_aux_func,NULL);
     lock_priority = list_entry(list_front(&curr_thread->lock_list), struct lock, lockElem)->donate_priority;
     if(lock_priority > curr_thread->origin_priority)
@@ -256,7 +257,7 @@ lock_release (struct lock *lock) {
     else
       curr_thread->priority = curr_thread->origin_priority;
   }
-  else*/
+  else
     curr_thread->priority = curr_thread->origin_priority;
   
   lock->holder = NULL;
