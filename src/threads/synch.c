@@ -202,7 +202,7 @@ lock_acquire (struct lock *lock)
 
   struct thread* curr_thread = thread_current();
 
-  if(lock->holder){//some other thread holds the lock
+  if(!thread_mlfqs && lock->holder){//some other thread holds the lock
     curr_thread->waitlock = lock;
     donate_priority(curr_thread);    
   }
@@ -247,20 +247,21 @@ lock_release (struct lock *lock) {
   ASSERT (lock != NULL);
   ASSERT (lock_held_by_current_thread (lock));
 
-  // remove lock from thread's list
-  list_remove(&lock->lockElem);
-  // reset priority
-  if(!list_empty(&curr_thread->lock_list)){
-    list_sort(&curr_thread->lock_list,lock_priority_aux_func,NULL);
-    lock_priority = list_entry(list_front(&curr_thread->lock_list), struct lock, lockElem)->donate_priority;
-    if(lock_priority > curr_thread->origin_priority)
-      curr_thread->priority = lock_priority;
+  if(!thread_mlfqs){
+    // remove lock from thread's list
+    list_remove(&lock->lockElem);
+    // reset priority
+    if(!list_empty(&curr_thread->lock_list)){
+      list_sort(&curr_thread->lock_list,lock_priority_aux_func,NULL);
+      lock_priority = list_entry(list_front(&curr_thread->lock_list), struct lock, lockElem)->donate_priority;
+      if(lock_priority > curr_thread->origin_priority)
+        curr_thread->priority = lock_priority;
+      else
+        curr_thread->priority = curr_thread->origin_priority;
+    }
     else
       curr_thread->priority = curr_thread->origin_priority;
-  }
-  else
-    curr_thread->priority = curr_thread->origin_priority;
-  
+  }  
   lock->holder = NULL;
   sema_up (&lock->semaphore);
 }

@@ -110,6 +110,9 @@ struct thread
 
     struct list lock_list;
     struct lock* waitlock;
+
+    int nice;       //int
+    int recent_cpu; //float
   };
 
 /* If false (default), use round-robin scheduler.
@@ -145,6 +148,10 @@ void thread_set_priority (int);
 
 void donate_priority(struct thread *);
 
+void mlfqs_set_load_avg(void);
+void mlfqs_set_recent_cpu(int tick);
+void mlfqs_update_priority();
+void thread_set_mlfqs_priority(struct thread* t);
 int thread_get_nice (void);
 void thread_set_nice (int);
 int thread_get_recent_cpu (void);
@@ -154,4 +161,11 @@ bool priority_aux_func (const struct list_elem* _a,
                         const struct list_elem* _b, 
                         void* aux UNUSED);
 void thread_change (void);
+
+// fixed_point arithmetic
+int float_to_int(int n);
+int int_to_float(int n);
+int float_mult(int n, int m);
+int float_div(int n, int m);
+
 #endif /* threads/thread.h */
