@@ -587,9 +587,11 @@ init_thread (struct thread *t, const char *name, int priority)
   list_push_back (&all_list, &t->allelem);
 
   if(thread_mlfqs){
-    if(strcmp(name,"main")){
-
-    }
+    t->nice = 0;
+    if(t==initial_thread)
+      t->recent_cpu = 0;
+    else
+      t->recent_cpu = thread_get_recent_cpu();
   }
 }
 
