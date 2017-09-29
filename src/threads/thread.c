@@ -406,7 +406,7 @@ mlfqs_set_load_avg(void)
   enum intr_level old_level;
   old_level = intr_disable();
   ready_threads = (int) list_size(&ready_list);
-  if(thread_current() == idle_thread)
+  if(thread_current() != idle_thread)
     ready_threads++;  // for load-1
   load_avg = float_mult(float_div(int_to_float(59),int_to_float(60)),load_avg) +
              float_mult(float_div(int_to_float(1), int_to_float(60)), int_to_float(ready_threads));
