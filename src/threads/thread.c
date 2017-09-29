@@ -429,9 +429,9 @@ mlfqs_set_recent_cpu(int second)
         t = list_entry (e, struct thread, allelem);
 
         t->recent_cpu = float_mult(t->recent_cpu,
-                            float_div(float_mult(load_avg,int_to_float(2)),
-                            (float_mult(load_avg,int_to_float(2))+int_to_float(1))))+
-                        int_to_float(t->niceness);
+                          float_div(float_mult(load_avg,int_to_float(2)),
+                          (float_mult(load_avg,int_to_float(2))+int_to_float(1))))+
+                        int_to_float(t->nice);
       }
   }
   intr_set_level(old_level);
@@ -448,7 +448,7 @@ mlfqs_update_priority()
   for (e = list_begin (&all_list); e != list_end (&all_list);
        e = list_next (e))
     thread_set_mlfqs_priority(list_entry (e, struct thread, allelem));
-  
+
   intr_set_level(old_level);
 }
 
