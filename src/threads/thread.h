@@ -150,7 +150,7 @@ void donate_priority(struct thread *);
 
 void mlfqs_set_load_avg(void);
 void mlfqs_set_recent_cpu(int tick);
-void mlfqs_update_priority();
+void mlfqs_update_priority(void);
 void thread_set_mlfqs_priority(struct thread* t);
 int thread_get_nice (void);
 void thread_set_nice (int);

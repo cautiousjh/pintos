@@ -241,7 +241,6 @@ lock_try_acquire (struct lock *lock)
 void
 lock_release (struct lock *lock) {
   int lock_priority;
-  struct list_elem *e;
   struct thread* curr_thread = thread_current();
 
   ASSERT (lock != NULL);
