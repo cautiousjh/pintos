@@ -220,7 +220,7 @@ timer_interrupt (struct intr_frame *args UNUSED)
 
   if(thread_mlfqs){
     //per second
-    if(! (timer_ticks()%TIMER_FREQ))
+    if(! (ticks%TIMER_FREQ))
       mlfqs_set_load_avg();
     mlfqs_set_recent_cpu(!(ticks%TIMER_FREQ));
     //every fourth tick
