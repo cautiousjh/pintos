@@ -400,7 +400,7 @@ donate_priority (struct thread *thread){
 }
 
 void 
-mlfqs_set_load_avg(void)
+mlfqs_set_load_avg (void)
 {
   int ready_threads;
   enum intr_level old_level;
