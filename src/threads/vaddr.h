@@ -63,7 +63,7 @@ is_user_vaddr (const void *vaddr)
 static inline bool
 is_kernel_vaddr (const void *vaddr) 
 {
-  printf("%d\n", *vaddr);
+  printf("%d\n", (int)(*vaddr);
   return vaddr >= PHYS_BASE;
 }
 
