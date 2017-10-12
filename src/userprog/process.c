@@ -471,7 +471,7 @@ setup_stack (void **esp, char *file_name, char **save_ptr)
 
         // push the addresses of arguments in stack (argv[])
         for(i=argc-1;i>=0;i--){
-          *esp -= sieof(char*);
+          *esp -= sizeof(char*);
           memcpy(*esp, &argv_addr[i], sizeof(char*));
         }
 
