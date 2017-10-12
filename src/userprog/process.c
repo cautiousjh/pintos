@@ -466,8 +466,8 @@ setup_stack (void **esp, char *file_name, char **save_ptr)
         // word-alignment
         while((int)(*esp)%4 != 0)
           (*esp)--;
-        *esp -= sieof(char*);
-        memcpy(*esp, &j, sieof(char*));
+        *esp -= sizeof(char*);
+        memcpy(*esp, &j, sizeof(char*));
 
         // push the addresses of arguments in stack (argv[])
         for(i=argc-1;i>=0;i--){
