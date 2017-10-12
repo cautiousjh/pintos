@@ -195,7 +195,7 @@ struct Elf32_Phdr
 #define PF_W 2          /* Writable. */
 #define PF_R 4          /* Readable. */
 
-static bool setup_stack (void **esp, const char *);
+static bool setup_stack (void **esp, char *, char**);
 static bool validate_segment (const struct Elf32_Phdr *, struct file *);
 static bool load_segment (struct file *file, off_t ofs, uint8_t *upage,
                           uint32_t read_bytes, uint32_t zero_bytes,
@@ -304,7 +304,7 @@ load (const char *file_name, void (**eip) (void), void **esp)
     }
 
   /* Set up stack. */
-  if (!setup_stack (esp, file_name, save_ptr))
+  if (!setup_stack (esp, file_name, &save_ptr))
     goto done;
 
   /* Start address. */
@@ -429,13 +429,13 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
 /* Create a minimal stack by mapping a zeroed page at the top of
    user virtual memory. */
 static bool
-setup_stack (void **esp, const char *file_name) 
+setup_stack (void **esp, char *file_name, char **save_ptr) 
 {
   uint8_t *kpage;
   bool success = false;
-  char *token, *save_ptr;
+  char *token;
   char **argv_addr;
-  int argc=0, i, j;
+  int  arg_length, argc=1, i, j;
 
   kpage = palloc_get_page (PAL_USER | PAL_ZERO);
   if (kpage != NULL) 
@@ -445,12 +445,46 @@ setup_stack (void **esp, const char *file_name)
         *esp = PHYS_BASE - 4;
 
         // argument parsing
-        for (token = strtok_r (file_name, " ", &save_ptr);
+        arg_length = strlen(file_name) + strlen(*save_ptr) + 1;
+        for (token = strtok_r (NULL, " ", save_ptr);
              token != NULL;
-             token = strtok_r (NULL, " ", &save_ptr)){
+             argc++, token = strtok_r (NULL, " ", save_ptr));
 
+        // push args and keep remembering addr of esp
+        argv_addr = malloc(sizeof(char*) * (argc+1));
+        for(i=arg_length, j=argc; i>=0; i--){
+          if (file_name[i] == ' ')
+            continue;
+          else if (file_name[i] == 0)
+            argv_addr[j--] = (*esp) + 1;
+          else
+            memcpy(--(*esp), &file_name[i], sizeof(char));
         }
-     printf ("'%s'\n", token);
+        ASSERT(j==0);
+        argv_addr[j] = *esp;
+
+        // word-alignment
+        while((int)(*esp)%4 != 0)
+          (*esp)--;
+        *esp -= sieof(char*);
+        memcpy(*esp, &j, sieof(char*));
+
+        // push the addresses of arguments in stack (argv[])
+        for(i=argc-1;i>=0;i--){
+          *esp -= sieof(char*);
+          memcpy(*esp, &argv_addr[i], sizeof(char*));
+        }
+
+        // push the address of argv
+        i = *esp;
+        *esp -= sizeof(int);
+        memcpy(*esp, &i, sizeof(int));
+
+        // push the return address **** what???
+        *esp -= sizeof(void*);
+        memcpy(*esp, &i, sizeof(int));
+
+        free(argv_addr);
       }
       else
         palloc_free_page (kpage);
