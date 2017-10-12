@@ -43,7 +43,7 @@ process_execute (const char *file_name)
   //adjust filename
   fn_tmp = malloc(sizeof(char)*strlen(file_name)+1);
   strlcpy(fn_tmp, file_name, strlen(file_name)+1);
-  file_name = strtok_r(tmp," ", &ptr);
+  file_name = strtok_r(fn_tmp," ", &ptr);
 
   tid = thread_create (file_name, PRI_DEFAULT, start_process, fn_copy);
   if (tid == TID_ERROR)
