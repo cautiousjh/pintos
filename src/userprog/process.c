@@ -448,7 +448,7 @@ setup_stack (void **esp, char *file_name, char **save_ptr)
     {
       success = install_page (((uint8_t *) PHYS_BASE) - PGSIZE, kpage, true);
       if (success){
-        *esp = PHYS_BASE;
+        *esp = PHYS_BASE-12;
 
         // argument parsing
         arg_length = strlen(file_name) + strlen(*save_ptr) + 1;
