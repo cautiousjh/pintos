@@ -448,7 +448,8 @@ setup_stack (void **esp, char *file_name, char **save_ptr)
         arg_length = strlen(file_name) + strlen(*save_ptr) + 1;
         for (token = strtok_r (NULL, " ", save_ptr);
              token != NULL;
-             argc++, token = strtok_r (NULL, " ", save_ptr));
+             argc++, token = strtok_r (NULL, " ", save_ptr))
+          printf("%s\n", save_ptr);
 
         // push args and keep remembering addr of esp
         argv_addr = malloc(sizeof(char*) * (argc+1));
