@@ -44,6 +44,7 @@ process_execute (const char *file_name)
   fn_tmp = malloc(sizeof(char)*strlen(file_name)+1);
   strlcpy(fn_tmp, file_name, strlen(file_name)+1);
   file_name = strtok_r(fn_tmp," ", &ptr);
+  printf("filename: %s\n", file_name);
 
   tid = thread_create (file_name, PRI_DEFAULT, start_process, fn_copy);
   if (tid == TID_ERROR)
@@ -448,7 +449,7 @@ setup_stack (void **esp, char *file_name, char **save_ptr)
     {
       success = install_page (((uint8_t *) PHYS_BASE) - PGSIZE, kpage, true);
       if (success){
-        *esp = PHYS_BASE-12;
+        *esp = PHYS_BASE;
 
         // argument parsing
         arg_length = strlen(file_name) + strlen(*save_ptr) + 1;
