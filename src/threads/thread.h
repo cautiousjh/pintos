@@ -23,7 +23,6 @@ typedef int tid_t;
 #define PRI_MIN 0                       /* Lowest priority. */
 #define PRI_DEFAULT 31                  /* Default priority. */
 #define PRI_MAX 63                      /* Highest priority. */
-#define DEPTH_LIMIT 10
 
 /* A kernel thread or user process.
 
@@ -85,7 +84,7 @@ struct thread
   {
     /* Owned by thread.c. */
     tid_t tid;                          /* Thread identifier. */
-    enum thread_status status;          /* Thread state. */ 
+    enum thread_status status;          /* Thread state. */
     char name[16];                      /* Name (for debugging purposes). */
     uint8_t *stack;                     /* Saved stack pointer. */
     int priority;                       /* Priority. */
@@ -101,18 +100,6 @@ struct thread
 
     /* Owned by thread.c. */
     unsigned magic;                     /* Detects stack overflow. */
-
-    struct list_elem sleepElem;
-    int64_t wakeup_time;               /* (added)when to wakeup */
-
-    bool isDonated;
-    int origin_priority;
-
-    struct list lock_list;
-    struct lock* waitlock;
-
-    int nice;       //int
-    int recent_cpu; //float
   };
 
 /* If false (default), use round-robin scheduler.
@@ -146,26 +133,9 @@ void thread_foreach (thread_action_func *, void *);
 int thread_get_priority (void);
 void thread_set_priority (int);
 
-void donate_priority(struct thread *);
-
-void mlfqs_set_load_avg(void);
-void mlfqs_set_recent_cpu(int tick);
-void mlfqs_update_priority(void);
-void thread_set_mlfqs_priority(struct thread* t);
 int thread_get_nice (void);
 void thread_set_nice (int);
 int thread_get_recent_cpu (void);
 int thread_get_load_avg (void);
-
-bool priority_aux_func (const struct list_elem* _a, 
-                        const struct list_elem* _b, 
-                        void* aux UNUSED);
-void thread_change (void);
-
-// fixed_point arithmetic
-int float_to_int(int n);
-int int_to_float(int n);
-int float_mult(int n, int m);
-int float_div(int n, int m);
 
 #endif /* threads/thread.h */
