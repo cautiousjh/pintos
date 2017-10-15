@@ -45,14 +45,14 @@ syscall_handler (struct intr_frame *f UNUSED)
 
 void 
 syscall_exit(struct thread *t, int status){ 
-	printf (“%s: exit(%d)\n”, t->name, status);
+	printf ("%s: exit(%d)\n", t->name, status);
 	thread_exit();
 }
 
 off_t
 syscall_write(int fd, char* buffer, off_t size){
 	if(fd==1){
-		putbuf(pagedir_get_page,size);
+		putbuf(buffer,size);
 	}
 
 }
