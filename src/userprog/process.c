@@ -461,7 +461,7 @@ setup_stack (void **esp, char *file_name, char **save_ptr)
 
         // push args and keep remembering addr of esp
         argv_addr = malloc(sizeof(char*) * (argc+1));
-        for(i=arg_length, j=argc; i>=0; i--){
+        for(i=arg_length, j=argc-1; i>=0; i--){
           if (file_name[i] == ' ')
             continue;
           else if (file_name[i] == 0)
