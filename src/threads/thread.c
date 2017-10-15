@@ -1,3 +1,4 @@
+//sample comment from windows OS
 #include "threads/thread.h"
 #include <debug.h>
 #include <stddef.h>
@@ -209,8 +210,6 @@ thread_create (const char *name, int priority,
   /* Add to run queue. */
   thread_unblock (t);
 
-  thread_change ();
-
   return tid;
 }
 
@@ -346,20 +345,13 @@ void
 thread_set_priority (int new_priority) 
 {
   thread_current ()->priority = new_priority;
-  thread_change();
 }
 
 /* Returns the current thread's priority. */
 int
 thread_get_priority (void) 
 {
-  struct thread* t = thread_current();
-  return t->isDonated? t->origin_priority : t->priority;
-}
-
-void 
-donate_priority (struct thread *thread){
-
+  return thread_current ()->priority;
 }
 
 /* Sets the current thread's nice value to NICE. */
@@ -478,9 +470,6 @@ init_thread (struct thread *t, const char *name, int priority)
   t->stack = (uint8_t *) t + PGSIZE;
   t->priority = priority;
   t->magic = THREAD_MAGIC;
-  t->isDonated = false;
-  list_init (&t->lock_list);
-  list_init (&t->donation_list);
   list_push_back (&all_list, &t->allelem);
 }
 
@@ -507,32 +496,8 @@ next_thread_to_run (void)
 {
   if (list_empty (&ready_list))
     return idle_thread;
-  else{
-    list_sort (&ready_list, priority_aux_func, NULL);
-    return list_entry(list_pop_back(&ready_list), struct thread, elem);
-  }
-}
-
-bool 
-priority_aux_func (const struct list_elem* _a, 
-                   const struct list_elem* _b, 
-                   void* aux UNUSED)
-{
-  const struct thread* a = list_entry(_a, struct thread, elem);
-  const struct thread* b = list_entry(_b, struct thread, elem);
-  return a->priority < b-> priority;
-}
-
-void
-thread_change(void)
-{
-  int highest_priority;
-  if(!list_empty(&ready_list)){
-    list_sort (&ready_list, priority_aux_func, NULL);
-    highest_priority = list_entry(list_back(&ready_list), struct thread, elem)->priority;
-    if(thread_current()->priority < highest_priority)
-      thread_yield();
-  }
+  else
+    return list_entry (list_pop_front (&ready_list), struct thread, elem);
 }
 
 /* Completes a thread switch by activating the new thread's page
