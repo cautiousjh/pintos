@@ -5,6 +5,7 @@
 #include "threads/thread.h"
 
 #include "devices/shutdown.h"
+#include "filesys/off_t.h"
 
 static void syscall_handler (struct intr_frame *);
 
