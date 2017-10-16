@@ -460,18 +460,20 @@ setup_stack (void **esp, char *file_name, char **save_ptr)
 
         // push args and keep remembering addr of esp
         argv_addr = malloc(sizeof(char*) * (argc+1));
-        for(i=arg_length, j=argc; i>=0; i--){
+        i=(file_name[arg_length] == file_name[arg_length-1])?
+          arg_length-1 : arg_length;
+        for(j=argc; i>=0; i--){
           if (file_name[i] == ' ')
             continue;
           else if (file_name[i] == 0){
-            memcpy(--(*esp), &file_name[i], sizeof(char));
             argv_addr[j--] = (*esp) + 1;
+            memcpy((*esp)--, &file_name[i], sizeof(char));
           }
           else
-            memcpy(--(*esp), &file_name[i], sizeof(char));
+            memcpy((*esp)--, &file_name[i], sizeof(char));
         }
         ASSERT(j==0);
-        argv_addr[j] = *esp;
+        argv_addr[j] = *esp + 1;
 
         // word-alignment
         while((int)(*esp)%4 != 0)
