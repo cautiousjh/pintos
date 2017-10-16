@@ -67,7 +67,7 @@ start_process (void *file_name_)
   if_.cs = SEL_UCSEG;
   if_.eflags = FLAG_IF | FLAG_MBS;
   success = load (file_name, &if_.eip, &if_.esp);
-
+  //WARNING
   /* If load failed, quit. */
   palloc_free_page (file_name);
   if (!success) 
@@ -456,16 +456,17 @@ setup_stack (void **esp, char *file_name, char **save_ptr)
         arg_length = strlen(file_name) + strlen(*save_ptr) + 1;
         for (token = strtok_r (NULL, " ", save_ptr);
              token != NULL;
-             argc++, token = strtok_r (NULL, " ", save_ptr))
-          printf("%s\n", *save_ptr);
+             token = strtok_r (NULL, " ", save_ptr), argc++);
 
         // push args and keep remembering addr of esp
         argv_addr = malloc(sizeof(char*) * (argc+1));
-        for(i=arg_length, j=argc-1; i>=0; i--){
+        for(i=arg_length, j=argc; i>=0; i--){
           if (file_name[i] == ' ')
             continue;
-          else if (file_name[i] == 0)
+          else if (file_name[i] == 0){
+            memcpy(--(*esp), &file_name[i], sizeof(char));
             argv_addr[j--] = (*esp) + 1;
+          }
           else
             memcpy(--(*esp), &file_name[i], sizeof(char));
         }
