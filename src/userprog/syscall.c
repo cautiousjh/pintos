@@ -36,7 +36,7 @@ syscall_handler (struct intr_frame *f UNUSED)
     	break;
     case SYS_EXEC:	
     	f->eax = syscall_exec(*((char**)(f->esp)+1));
-    	break;//	break; 
+    	break;
     case SYS_WAIT:	
     	f->eax = syscall_wait(*((int*)(f->esp)+1));
     	break;
@@ -121,24 +121,27 @@ syscall_create(const char* name, unsigned size)
 bool 
 syscall_remove(const char* name)
 {
-
+	return -1;
 }
 
 int
 syscall_open(const char* name)
 {
+	return -1;
 
 }
 
 int
 syscall_filesize(int fd)
 {
+	return -1;
 
 }
 
 int
-syscall_read(int fd, char* buffer, of_t size)
+syscall_read(int fd, char* buffer, off_t size)
 {
+	return -1;
 
 }
 
@@ -153,18 +156,21 @@ syscall_write(int fd, char* buffer, off_t size)
 void
 syscall_seek(int fd, unsigned position)
 {
+	return -1;
 
 }
 
 unsigned
 syscall_tell(int fd)
 {
+	return -1;
 
 }
 
 void
 syscall_close(int fd)
 {
+	return -1;
 
 }
 
