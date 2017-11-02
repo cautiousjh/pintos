@@ -210,10 +210,14 @@ thread_create (const char *name, int priority,
   sf->ebp = 0;
 
 #ifdef USERPROG  //init
-  t->parent = thread_current();
   list_init(&t->children);
   child_temp = malloc(sizeof(struct child_thread));
-  list_push_back (&t->parent->children, &child_temp->elem);
+  if(t!=initial_thread && strcmp(name, "idle")){
+    t->parent = thread_current();
+    list_push_back (&t->parent->children, &child_temp->elem);
+  }
+  else
+    t->parent =NULL;
   child_temp->child = t;
   child_temp->tid = t->tid;
   child_temp->isValid = true;
