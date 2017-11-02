@@ -115,6 +115,7 @@ struct thread
     struct thread *parent;
     bool isChildLoaded;
     bool isWaiting;
+    struct file* exe_file;
     struct list children;
     struct list fd_list;
 #endif

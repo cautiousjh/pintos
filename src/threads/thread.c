@@ -226,6 +226,7 @@ thread_create (const char *name, int priority,
     t->parent =NULL;
   child_temp->thread_pointer = t;
   child_temp->tid = t->tid;
+  t->exe_file = NULL;
   child_temp->isValid = true;
   t->isChildLoaded = false;
   t->isWaiting = false;

@@ -167,9 +167,8 @@ process_exit (void)
     if(list_entry(iter, struct child_thread, elem)->tid == curr_thread->tid)
       child_temp = list_entry(iter, struct child_thread, elem);
 
-  // close all files
-
-  // free child list
+  // close exe file
+  file_close(cur->exe_file);
 
   // release(up) wait_sema
   if(curr_thread->parent->isWaiting)
@@ -393,7 +392,12 @@ load (const char *file_name, void (**eip) (void), void **esp)
 
  done:
   /* We arrive here whether the load is successful or not. */
-  file_close (file);
+  if(success){
+    t->exe_file = file;
+    file_deny_write(file);
+  }
+  else
+    file_close (file);
   return success;
 }
 
