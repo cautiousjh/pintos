@@ -5,10 +5,10 @@
 #include <syscall-nr.h>
 #include "threads/interrupt.h"
 #include "threads/thread.h"
-
+#include "filesys/filesys.h"
 #include "devices/shutdown.h"
 
-//#define ASSERT_EXIT( COND ) { if(!(COND))}
+#define ASSERT_EXIT( COND ) { if(!(COND)) syscall_exit(-1); }
 
 static void syscall_handler (struct intr_frame *);
 
@@ -41,27 +41,36 @@ syscall_handler (struct intr_frame *f UNUSED)
     	f->eax = syscall_wait(*((int*)(f->esp)+1));
     	break;
     case SYS_CREATE:
-    	//syscall_create(*((char**)(f->esp)+1), *((unsigned*)(f->esp)+2));
+    	f->eax = syscall_create(*((char**)(f->esp)+1), *((unsigned*)(f->esp)+2));
     	break;
     case SYS_REMOVE:
-    	break;//syscall_remove();	break;
+    	f->eax = syscall_remove(*((char**)(f->esp)+1));
+    	break;
     case SYS_OPEN:
-    	break;//syscall_open();		break;
+    	f->eax = syscall_open(*((char**)(f->esp)+1));
+    	break;
     case SYS_FILESIZE:
-    	break;//syscall_filesize();	break;
-    case SYS_READ: 
-    	break;//syscall_read();		break;
+    	f->eax = syscall_filesize(*((char**)(f->esp)+1));
+    	break;
+    case SYS_READ:
+    	f->eax = syscall_read(*((int*)(f->esp)+1),
+    						  *((char**)(f->esp)+2),
+    				  		  *((off_t*)(f->esp)+3)); 
+    	break;
     case SYS_WRITE: 
     	f->eax = syscall_write(*((int*)(f->esp)+1),
-    						  	*((char**)(f->esp)+2),
-    				  			*((off_t*)(f->esp)+3));
+    						   *((char**)(f->esp)+2),
+    				  		   *((off_t*)(f->esp)+3));
     	break;
     case SYS_SEEK:
-    	break;//syscall_seek();		break;
+    	syscall_seek(*((int*)(f->esp)+1), *((unsigned*)(f->esp)+2)); 
+    	break;
     case SYS_TELL:
-     	break;//syscall_tell();		break;
+    	f->eax = syscall_tell(*((char**)(f->esp)+1)); 
+     	break;
     case SYS_CLOSE:
-     	break;//syscall_close();	break;
+    	syscall_close(*((char**)(f->esp)+1)); 
+     	break;
     default: break;
   }
 }
@@ -94,7 +103,6 @@ syscall_exec(char* cmd_str)
 		return -1;
 	else
 		return process_execute(cmd_str);
-
 }
 
 int
@@ -103,11 +111,36 @@ syscall_wait(pid_t pid)
 	return process_wait(pid);
 }
 
-//bool
-//syscall_create(char* name, unsigned size)
-//{
+bool
+syscall_create(const char* name, unsigned size)
+{
+	ASSERT_EXIT(name);
+	return filesys_create(file, size, false);
+}
 
-//}
+bool 
+syscall_remove(const char* name)
+{
+
+}
+
+int
+syscall_open(const char* name)
+{
+
+}
+
+int
+syscall_filesize(int fd)
+{
+
+}
+
+int
+syscall_read(int fd, char* buffer, of_t size)
+{
+
+}
 
 off_t
 syscall_write(int fd, char* buffer, off_t size)
@@ -117,3 +150,22 @@ syscall_write(int fd, char* buffer, off_t size)
 	}
 
 }
+void
+syscall_seek(int fd, unsigned position)
+{
+
+}
+
+unsigned
+syscall_tell(int fd)
+{
+
+}
+
+void
+syscall_close(int fd)
+{
+
+}
+
+
