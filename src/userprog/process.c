@@ -55,13 +55,13 @@ process_execute (const char *file_name)
     palloc_free_page (fn_copy); 
   free(fn_tmp);
 
-  // check if process started successfully
+  // check if process started successfully  
   sema_down(&curr_thread->sema_load);
-  
+
   if(curr_thread->isChildLoaded)
     curr_thread->isChildLoaded = false;
   else
-    return -1;
+    tid = -1;
 
   return tid;
 }

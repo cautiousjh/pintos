@@ -8,6 +8,8 @@
 
 #include "devices/shutdown.h"
 
+//#define ASSERT_EXIT( COND ) { if(!(COND))}
+
 static void syscall_handler (struct intr_frame *);
 
 void
@@ -30,16 +32,17 @@ syscall_handler (struct intr_frame *f UNUSED)
     	shutdown_power_off();
     	break;
     case SYS_EXIT:	
-    	syscall_exit(*((int*)(f->esp)+1));
+    	f->eax = syscall_exit(*((int*)(f->esp)+1));
     	break;
     case SYS_EXEC:	
-    	syscall_exec(*((char**)(f->esp)+1));
+    	f->eax = syscall_exec(*((char**)(f->esp)+1));
     	break;//	break; 
     case SYS_WAIT:	
-    	syscall_wait(*((int*)(f->esp)+1));
+    	f->eax syscall_wait(*((int*)(f->esp)+1));
     	break;
     case SYS_CREATE:
-    	break;//syscall_create();	break;
+    	//syscall_create(*((char**)(f->esp)+1), *((unsigned*)(f->esp)+2));
+    	break;
     case SYS_REMOVE:
     	break;//syscall_remove();	break;
     case SYS_OPEN:
@@ -49,9 +52,9 @@ syscall_handler (struct intr_frame *f UNUSED)
     case SYS_READ: 
     	break;//syscall_read();		break;
     case SYS_WRITE: 
-    	syscall_write(*((int*)(f->esp)+1),
-    				  *((char**)(f->esp)+2),
-    				  *((off_t*)(f->esp)+3));
+    	//syscall_write(*((int*)(f->esp)+1),
+    	//			  *((char**)(f->esp)+2),
+    	//			  *((off_t*)(f->esp)+3));
     	break;
     case SYS_SEEK:
     	break;//syscall_seek();		break;
@@ -99,6 +102,12 @@ syscall_wait(pid_t pid)
 {
 	return process_wait(pid);
 }
+
+//bool
+//syscall_create(char* name, unsigned size)
+//{
+
+//}
 
 off_t
 syscall_write(int fd, char* buffer, off_t size)
