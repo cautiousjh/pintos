@@ -6,7 +6,8 @@
 
 void syscall_init (void);
 
-void syscall_exit(struct thread *t, int status);
+pid_t syscall_exec(char* cmd_str);
+void syscall_exit(int status);
 
 off_t syscall_write(int fd, char* buffer, off_t size);
 

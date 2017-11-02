@@ -28,6 +28,7 @@ static bool load (const char *cmdline, void (**eip) (void), void **esp);
 tid_t
 process_execute (const char *file_name) 
 {
+  struct thread *curr_thread = thread_current();
   char *fn_copy;
   tid_t tid;
   char *fn_tmp, *ptr;
@@ -39,6 +40,9 @@ process_execute (const char *file_name)
     return TID_ERROR;
   strlcpy (fn_copy, file_name, PGSIZE);
 
+  // init load_sema
+  sema_init(&curr_thread->load_sema, 0);
+
   /* Create a new thread to execute FILE_NAME. */
   //adjust filename
   fn_tmp = malloc(sizeof(char)*strlen(file_name)+1);
@@ -48,6 +52,16 @@ process_execute (const char *file_name)
   tid = thread_create (file_name, PRI_DEFAULT, start_process, fn_copy);
   if (tid == TID_ERROR)
     palloc_free_page (fn_copy); 
+  free(fn_tmp);
+
+  // check if process started successfully
+  sema_down(&curr_thread->load_sema);
+  
+  if(curr_thread->isChildLoaded)
+    curr_thread->isChildLoaded = false;
+  else
+    return -1;
+
   return tid;
 }
 
@@ -56,6 +70,7 @@ process_execute (const char *file_name)
 static void
 start_process (void *file_name_)
 {
+  struct thread *curr_thread = thread_curent();
   char *file_name = file_name_;
   struct intr_frame if_;
   bool success;
@@ -66,11 +81,18 @@ start_process (void *file_name_)
   if_.cs = SEL_UCSEG;
   if_.eflags = FLAG_IF | FLAG_MBS;
   success = load (file_name, &if_.eip, &if_.esp);
-  //WARNING
+
   /* If load failed, quit. */
   palloc_free_page (file_name);
-  if (!success) 
-    thread_exit ();
+  if (!success) {
+    curr_thread->parent->isChildLoaded = false;
+    sema_up(&curr_thread->parent->sema_load);
+    syscall_exit(-1);
+  }
+  else{
+    curr_thread->parent->isChildLoaded = true;
+    sema_up(&curr_thread->parent->sema_load);
+  }
 
   /* Start the user process by simulating a return from an
      interrupt, implemented by intr_exit (in
@@ -92,17 +114,51 @@ start_process (void *file_name_)
    This function will be implemented in problem 2-2.  For now, it
    does nothing. */
 int
-process_wait (tid_t child_tid UNUSED) 
+process_wait (tid_t child_tid)
 {
-  return -1;
+  struct thread* curr_thread = thread_current();
+  struct child_thread* child = NULL;
+  struct child_thread* iter;
+
+  for(iter = list_begin(&curr_thread->children);
+      iter != list_end(&curr_thread->children);
+      iter = iter->next)
+    if(iter->tid == child_tid)
+      child = list_entry(iter, struct child_thread, elem);
+
+  if(curr_thread->isWaiting)
+    return -1;
+  else if(child == NULL)
+    return -1;
+  else if(!child->isValid){
+    curr_thread->isWaiting = true;
+    return chlid->exit_code;
+  }
+
+  sema_init(&child->sema_wait,0);
+  curr_thread->isWaiting = true;
+  sema_down(&child->sema_wait);
+  return child->exit_code;
 }
 
 /* Free the current process's resources. */
 void
-process_exit (void)
+process_exit (struct thread* t)
 {
   struct thread *cur = thread_current ();
   uint32_t *pd;
+  struct child_thread* iter;
+
+  // kill all children
+  for(iter = list_begin(&curr_thread->children);
+      iter != list_end(&curr_thread->children);
+      iter = iter->next)
+    if(iter->isValid)
+      syscall_exit()
+      child = list_entry(iter, struct child_thread, elem);
+
+
+  // close files opened
 
   /* Destroy the current process's page directory and switch back
      to the kernel-only page directory. */
@@ -448,7 +504,7 @@ setup_stack (void **esp, char *file_name, char **save_ptr)
     {
       success = install_page (((uint8_t *) PHYS_BASE) - PGSIZE, kpage, true);
       if (success){
-        *esp = PHYS_BASE;
+        *esp = PHYS_BASE-4;
 
         // argument parsing
         arg_length = strlen(file_name) + strlen(*save_ptr) + 1;
