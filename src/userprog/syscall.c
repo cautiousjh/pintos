@@ -153,7 +153,6 @@ int
 syscall_filesize(int fd)
 {
 	struct file* f;
-	ASSERT_EXIT(name);
 	if(!(f = get_file_elem(fd)->this_file))
 		return -1;
 	return file_length(f);
@@ -215,7 +214,7 @@ get_file_elem(int fd){
 
 static struct lock file_lock;
 
-static int
+int
 set_new_fd(void){
 	static int global_fd = 2;
 	int new_fd;
