@@ -8,6 +8,7 @@
 #include "userprog/gdt.h"
 #include "userprog/pagedir.h"
 #include "userprog/tss.h"
+#include "userprog/syscall.h"
 #include "filesys/directory.h"
 #include "filesys/file.h"
 #include "filesys/filesys.h"
@@ -41,7 +42,7 @@ process_execute (const char *file_name)
   strlcpy (fn_copy, file_name, PGSIZE);
 
   // init load_sema
-  sema_init(&curr_thread->load_sema, 0);
+  sema_init(&curr_thread->sema_load, 0);
 
   /* Create a new thread to execute FILE_NAME. */
   //adjust filename
@@ -55,7 +56,7 @@ process_execute (const char *file_name)
   free(fn_tmp);
 
   // check if process started successfully
-  sema_down(&curr_thread->load_sema);
+  sema_down(&curr_thread->sema_load);
   
   if(curr_thread->isChildLoaded)
     curr_thread->isChildLoaded = false;
@@ -70,7 +71,7 @@ process_execute (const char *file_name)
 static void
 start_process (void *file_name_)
 {
-  struct thread *curr_thread = thread_curent();
+  struct thread *curr_thread = thread_current();
   char *file_name = file_name_;
   struct intr_frame if_;
   bool success;
@@ -118,7 +119,7 @@ process_wait (tid_t child_tid)
 {
   struct thread* curr_thread = thread_current();
   struct child_thread* child = NULL;
-  struct child_thread* iter;
+  struct list_elem* iter;
 
   for(iter = list_begin(&curr_thread->children);
       iter != list_end(&curr_thread->children);
@@ -147,7 +148,7 @@ process_exit (void)
 {
   struct thread *cur = thread_current ();
   uint32_t *pd;
-  struct child_thread* iter;
+  struct list_elem* iter;
 
   // kill all children
   for(iter = list_begin(&curr_thread->children);
