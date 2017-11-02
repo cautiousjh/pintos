@@ -76,7 +76,7 @@ syscall_exit(int status)
 		}
 		
 	printf ("%s: exit(%d)\n", curr_thread->name, status);
-	process_exit(curr_thread);
+	thread_exit(curr_thread);
 }
 
 pid_t
