@@ -70,7 +70,7 @@ syscall_exit(int status)
 	for(iter = list_begin(&curr_thread->children);
 	    iter != list_end(&curr_thread->children);
 	    iter = iter->next)
-		if(iter->tid == curr_thread->tid){
+		if(list_entry(iter, struct child_thread, elem)->tid == curr_thread->tid){
 	    	list_entry(iter, struct child_thread, elem)->exit_code = status;
 	    	break;
 		}
