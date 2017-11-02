@@ -164,18 +164,26 @@ syscall_filesize(int fd)
 int
 syscall_read(int fd, char* buffer, off_t size)
 {
-	ASSERT_EXIT(fd == STDIN_FILENO || get_file_elem(fd)->this_file);
-	return -1;
+	int i;
 
+	ASSERT_EXIT(fd == STDIN_FILENO || get_file_elem(fd)->this_file);
+	if(fd==STDIN_FILENO){
+		for(i=0;i<size;i++)
+			buffer[i] = input_getc();
+		return i;
+	}
+	return file_read(get_file_elem(fd)->this_file, buffer, size);
 }
 
 off_t
 syscall_write(int fd, char* buffer, off_t size)
 {
-	if(fd==1){
+	ASSERT_EXIT(fd == STDOUT_FILENO || get_file_elem(fd)->this_file);
+	if(fd==STDOUT_FILENO){
 		putbuf(buffer,size);
+		return size;
 	}
-
+	return file_write(get_file_elem(fd)->this_file, buffer, size);
 }
 void
 syscall_seek(int fd, unsigned position)
