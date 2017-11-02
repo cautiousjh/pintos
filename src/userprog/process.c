@@ -125,7 +125,7 @@ process_wait (tid_t child_tid)
       iter != list_end(&curr_thread->children);
       iter = iter->next)
     if(list_entry(iter, struct child_thread, elem)->tid == child_tid)
-      child = list_entry(iter, struct child_thread, elem);
+      child_temp = list_entry(iter, struct child_thread, elem);
 
   if(curr_thread->isWaiting)
     return -1;
