@@ -94,7 +94,7 @@ struct child_thread
 
   bool isValid;
   bool isWaiting;
-}
+};
 #endif
 struct thread
   {
