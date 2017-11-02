@@ -85,7 +85,7 @@ typedef int tid_t;
 #ifdef USERPROG
 struct child_thread
 {
-  struct thread *child;
+  struct thread *thread_pointer;
   struct list_elem elem;
 
   int tid;

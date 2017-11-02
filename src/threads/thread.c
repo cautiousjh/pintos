@@ -222,7 +222,7 @@ thread_create (const char *name, int priority,
   }
   else
     t->parent =NULL;
-  child_temp->child = t;
+  child_temp->thread_pointer = t;
   child_temp->tid = t->tid;
   child_temp->isValid = true;
   t->isChildLoaded = false;

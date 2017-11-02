@@ -136,9 +136,10 @@ process_wait (tid_t child_tid)
     return child_temp->exit_code;
   }
 
-  sema_init(&child_temp->child->parent->sema_wait,0);
-  child_temp->child->parent->isWaiting = true;
-  sema_down(&child_temp->child->parent->sema_wait);
+  sema_init(&child_temp->thread_pointer->parent->sema_wait,0);
+  child_temp->thread_pointer->parent->isWaiting = true;
+  sema_down(&child_temp->thread_pointer->parent->sema_wait);
+  child_temp->thread_pointer->parent->isWaiting = false;
   return child_temp->exit_code;
 }
 
