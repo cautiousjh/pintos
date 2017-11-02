@@ -14,7 +14,7 @@ bool syscall_create(const char* name, unsigned size);
 bool syscall_remove(const char* name);
 int syscall_open(const char* name);
 int syscall_filesize(int fd);
-int syscall_read(int fd, char* buffer, of_t size);
+int syscall_read(int fd, char* buffer, off_t size);
 off_t syscall_write(int fd, char* buffer, off_t size);
 void syscall_seek(int fd, unsigned position);
 unsigned syscall_tell(int fd);
