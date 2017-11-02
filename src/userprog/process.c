@@ -143,7 +143,7 @@ process_wait (tid_t child_tid)
 
 /* Free the current process's resources. */
 void
-process_exit (struct thread* t)
+process_exit (void)
 {
   struct thread *cur = thread_current ();
   uint32_t *pd;

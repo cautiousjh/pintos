@@ -72,15 +72,6 @@ static void schedule (void);
 void thread_schedule_tail (struct thread *prev);
 static tid_t allocate_tid (void);
 
-#ifdef USERPROG
-struct child_thread*
-get_child()
-{
-  
-}
-
-#endif
-
 /* Initializes the threading system by transforming the code
    that's currently running into a thread.  This can't work in
    general and it is possible in this case only because loader.S
@@ -222,7 +213,7 @@ thread_create (const char *name, int priority,
   t->isChildLoaded = false;
   t->parent = thread_current();
   list_init(&t->children);
-  child_temp = malloc(szieof(struct child_thread));
+  child_temp = malloc(sizeof(struct child_thread));
   list_push_back (&t->parent->children, &child_temp->elem);
   child_temp->child = t;
   child_temp->tid = t->tid;
