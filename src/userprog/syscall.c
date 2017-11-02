@@ -251,25 +251,6 @@ bool close_file(int fd)
 // NOT IMPLEMENTED
 void close_all_file()
 {
-	struct thread* curr_thread = thread_current();
-	struct list_elem* iter;
-	struct file_elem* felem;
-
-	if(list_empty(&curr_thread->fd_list))
-		return false;
-
-	for(iter = list_begin(&curr_thread->fd_list);
-		iter != list_end(&curr_thread->fd_list);
-		iter = iter->next){
-		felem = list_entry(iter, struct file_elem, elem);
-		if(felem->fd == fd){
-			file_close(felem->this_file);
-			list_remove(iter);
-			free(felem);
-			return true;
-		}
-	}
-	return false;
 }
 
 
