@@ -210,7 +210,6 @@ thread_create (const char *name, int priority,
   sf->ebp = 0;
 
 #ifdef USERPROG  //init
-  t->isChildLoaded = false;
   t->parent = thread_current();
   list_init(&t->children);
   child_temp = malloc(sizeof(struct child_thread));
@@ -218,7 +217,8 @@ thread_create (const char *name, int priority,
   child_temp->child = t;
   child_temp->tid = t->tid;
   child_temp->isValid = true;
-  child_temp->isWaiting = false;
+  t->isChildLoaded = false;
+  t->isWaiting = false;
 #endif
 
   intr_set_level (old_level);
