@@ -62,7 +62,7 @@ void
 syscall_exit(int status)
 {
 	struct thread * curr_thread = thread_current(); 
-	struct child_thread* iter;
+	struct list_elem* iter;
 
 	// TODO: close files opened
 
