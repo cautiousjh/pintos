@@ -32,7 +32,7 @@ syscall_handler (struct intr_frame *f UNUSED)
     	shutdown_power_off();
     	break;
     case SYS_EXIT:	
-    	f->eax = syscall_exit(*((int*)(f->esp)+1));
+    	syscall_exit(*((int*)(f->esp)+1));
     	break;
     case SYS_EXEC:	
     	f->eax = syscall_exec(*((char**)(f->esp)+1));
