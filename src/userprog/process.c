@@ -149,17 +149,24 @@ process_exit (void)
   struct thread *curr_thread = thread_current ();
   uint32_t *pd;
   struct list_elem* iter;
+  struct child_thread* child_tmp;
 
   // kill all children
-  for(iter = list_begin(&curr_thread->children);
-      iter != list_end(&curr_thread->children);
-      iter = iter->next)
-    if(list_entry(iter, struct child_thread, elem)->isValid)
-      syscall_exit(-1); //////TODO
+  //for(iter = list_begin(&curr_thread->children);
+  //    iter != list_end(&curr_thread->children);
+  //    iter = iter->next)
+  //  if(list_entry(iter, struct child_thread, elem)->isValid)
+  //    syscall_exit(-1); //////TODO
       //child = list_entry(iter, struct child_thread, elem);
 
 
-  // close files opened
+  // close all files
+
+  // free child list
+
+  // release(up) wait_sema
+  if(child_temp->child->parent->isWaiting)
+    sema_up(child_temp->sema_wait);
 
   /* Destroy the current process's page directory and switch back
      to the kernel-only page directory. */
