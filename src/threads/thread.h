@@ -116,6 +116,7 @@ struct thread
     bool isChildLoaded;
     bool isWaiting;
     struct list children;
+    struct list fd_list;
 #endif
 
     /* Owned by thread.c. */

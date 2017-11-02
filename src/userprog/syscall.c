@@ -5,6 +5,8 @@
 #include <syscall-nr.h>
 #include "threads/interrupt.h"
 #include "threads/thread.h"
+#include "threads/synch.h"
+#include "filesys/file.h"
 #include "filesys/filesys.h"
 #include "devices/shutdown.h"
 
@@ -121,21 +123,40 @@ syscall_create(const char* name, unsigned size)
 bool 
 syscall_remove(const char* name)
 {
-	return -1;
+	ASSERT_EXIT(name);
+	return filesys_remove(name);
 }
 
 int
 syscall_open(const char* name)
 {
-	return -1;
+	struct file* open_file;
+	struct file_elem* felem;
 
+	ASSERT_EXIT(name);
+	
+	// filesys open
+	open_file = filesys_open(name);
+	if(!open_file)
+		return -1;
+
+	//add file to thread
+	felem = malloc(sizeof(struct file_elem));
+	felem->fd = set_new_fd();
+	felem->this_file = open_file;
+	list_push_back(&thread_current()->fd_list, &felem->elem);
+
+	return felem->fd;
 }
 
 int
 syscall_filesize(int fd)
 {
-	return -1;
-
+	struct file* f;
+	ASSERT_EXIT(name);
+	if(!(f = get_file_elem(fd)->this_file))
+		return -1;
+	return file_length(f);
 }
 
 int
@@ -175,3 +196,33 @@ syscall_close(int fd)
 }
 
 
+struct file_elem*
+get_file_elem(int fd){
+	struct thread* curr_thread = thread_curent();
+	struct list_elem* iter;
+	
+	if(list_empty(&curr_thread->fd_list))
+		return NULL;
+
+	for(iter = list_begin(&curr_thread->fd_list);
+		iter != list_end(&curr_thread->fd_list);
+		iter = iter->next)
+		if(list_entry(iter,struct file_elem, elem)->fd == fd)
+			return list_entry(iter,struct file_elem, elem);
+	return NULL;
+}
+
+
+static struct lock file_lock;
+
+static int
+set_new_fd(void){
+	static int global_fd = 2;
+	int new_fd;
+
+	lock_acquire(&file_lock);
+	new_fd = global_fd++;
+	lock_release(&file_lock);
+
+	return new_fd;
+}

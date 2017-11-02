@@ -215,6 +215,7 @@ thread_create (const char *name, int priority,
 
 #ifdef USERPROG  //init
   list_init(&t->children);
+  list_init(&t->fd_list);
   child_temp = malloc(sizeof(struct child_thread));
   if(t!=initial_thread){
     t->parent = thread_current();
