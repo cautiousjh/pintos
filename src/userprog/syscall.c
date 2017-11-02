@@ -197,7 +197,7 @@ syscall_close(int fd)
 
 struct file_elem*
 get_file_elem(int fd){
-	struct thread* curr_thread = thread_curent();
+	struct thread* curr_thread = thread_current();
 	struct list_elem* iter;
 	
 	if(list_empty(&curr_thread->fd_list))
