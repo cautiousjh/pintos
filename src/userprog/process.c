@@ -168,7 +168,7 @@ process_exit (void)
       child_temp = list_entry(iter, struct child_thread, elem);
 
   // close exe file
-  file_close(cur->exe_file);
+  file_close(curr_thread->exe_file);
 
   // release(up) wait_sema
   if(curr_thread->parent->isWaiting)
