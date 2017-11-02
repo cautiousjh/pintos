@@ -149,7 +149,7 @@ process_exit (void)
   struct thread *curr_thread = thread_current ();
   uint32_t *pd;
   struct list_elem* iter;
-  struct child_thread* child_tmp;
+  struct child_thread* child_temp;
 
   // kill all children
   //for(iter = list_begin(&curr_thread->children);
@@ -165,8 +165,9 @@ process_exit (void)
   // free child list
 
   // release(up) wait_sema
-  if(child_temp->child->parent->isWaiting)
-    sema_up(child_temp->sema_wait);
+  if(curr_thread->parent->isWaiting)
+    sema_up(list_entry(list_back(curr_thread->children), 
+      struct child_thread, elem)->sema_wait);
 
   /* Destroy the current process's page directory and switch back
      to the kernel-only page directory. */
