@@ -164,7 +164,7 @@ syscall_filesize(int fd)
 int
 syscall_read(int fd, char* buffer, off_t size)
 {
-	ASSERT_EXIT()
+	ASSERT_EXIT(fd == STDIN_FILENO || get_file_elem(fd)->this_file);
 	return -1;
 
 }
