@@ -34,7 +34,7 @@ syscall_handler (struct intr_frame *f UNUSED)
     	syscall_exec(*((char**)(f->esp)+1));
     	break;//	break; 
     case SYS_WAIT:	
-    	syscall_wait();
+    	syscall_wait(*((int*)(f->esp)+1));
     	break;
     case SYS_CREATE:
     	break;//syscall_create();	break;
