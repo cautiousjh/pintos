@@ -87,7 +87,7 @@ start_process (void *file_name_)
   palloc_free_page (file_name);
   if (!success) {
     curr_thread->parent->isChildLoaded = false;
-    //sema_up(&curr_thread->parent->sema_load);
+    sema_up(&curr_thread->parent->sema_load);
     syscall_exit(-1);
   }
   else{
