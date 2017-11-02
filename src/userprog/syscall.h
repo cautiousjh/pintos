@@ -22,7 +22,8 @@ void syscall_close(int fd);
 
 
 struct file_elem* get_file_elem(int fd);
-
+bool close_file(int fd);
+void close_all_file();
 int set_new_fd(void);
 
 #endif /* userprog/syscall.h */

@@ -188,22 +188,24 @@ syscall_write(int fd, char* buffer, off_t size)
 void
 syscall_seek(int fd, unsigned position)
 {
-	return -1;
-
+	ASSERT_EXIT(get_file_elem(fd)->this_file);
+	return file_seek(get_file_elem(fd)->this_file, position);
 }
 
 unsigned
 syscall_tell(int fd)
 {
-	return -1;
-
+	ASSERT_EXIT(get_file_elem(fd)->this_file);
+	return file_tell(get_file_elem(fd)->this_file);
 }
 
 void
 syscall_close(int fd)
 {
-	return -1;
-
+	ASSERT_EXIT(get_file_elem(fd)->this_file);
+	if(fd == STDOUT_FILENO || fd == STDIN_FILENO)
+		return;
+	ASSERT_EXIT(close_file(fd));
 }
 
 
@@ -223,6 +225,52 @@ get_file_elem(int fd){
 	return NULL;
 }
 
+bool close_file(int fd)
+{
+	struct thread* curr_thread = thread_current();
+	struct list_elem* iter;
+	struct file_elem* felem;
+
+	if(list_empty(&curr_thread->fd_list))
+		return false;
+
+	for(iter = list_begin(&curr_thread->fd_list);
+		iter != list_end(&curr_thread->fd_list);
+		iter = iter->next){
+		felem = list_entry(iter, struct file_elem, elem);
+		if(felem->fd == fd){
+			file_close(felem->this_file);
+			list_remove(iter);
+			free(felem);
+			return true;
+		}
+	}
+	return false;
+}
+
+// NOT IMPLEMENTED
+void close_all_file()
+{
+	struct thread* curr_thread = thread_current();
+	struct list_elem* iter;
+	struct file_elem* felem;
+
+	if(list_empty(&curr_thread->fd_list))
+		return false;
+
+	for(iter = list_begin(&curr_thread->fd_list);
+		iter != list_end(&curr_thread->fd_list);
+		iter = iter->next){
+		felem = list_entry(iter, struct file_elem, elem);
+		if(felem->fd == fd){
+			file_close(felem->this_file);
+			list_remove(iter);
+			free(felem);
+			return true;
+		}
+	}
+	return false;
+}
 
 
 int
