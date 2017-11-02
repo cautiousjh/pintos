@@ -93,7 +93,6 @@ struct child_thread
   int exit_code;
 
   bool isValid;
-  bool isWaiting;
 };
 #endif
 struct thread
@@ -115,6 +114,7 @@ struct thread
     struct semaphore sema_load;
     struct thread *parent;
     bool isChildLoaded;
+    bool isWaiting;
     struct list children;
 #endif
 
