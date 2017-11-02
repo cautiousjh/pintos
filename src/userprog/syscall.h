@@ -21,4 +21,8 @@ unsigned syscall_tell(int fd);
 void syscall_close(int fd);
 
 
+struct file_elem* get_file_elem(int fd);
+
+int set_new_fd(void);
+
 #endif /* userprog/syscall.h */
