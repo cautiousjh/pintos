@@ -160,6 +160,12 @@ process_exit (void)
   //    syscall_exit(-1); //////TODO
       //child = list_entry(iter, struct child_thread, elem);
 
+  // find itself in parent's children list
+  for(iter = list_begin(&curr_thread->parent->children);
+      iter != list_end(&curr_thread->parent->children);
+      iter = iter->next)
+    if(list_entry(iter, struct child_thread, elem)->tid == curr_thread->tid)
+      child_temp = list_entry(iter, struct child_thread, elem);
 
   // close all files
 
@@ -169,7 +175,7 @@ process_exit (void)
   if(curr_thread->parent->isWaiting)
     sema_up(&curr_thread->parent->sema_wait);
   else
-    curr_thread->isValid = false;
+    child_temp->isValid = false;
 
   /* Destroy the current process's page directory and switch back
      to the kernel-only page directory. */
