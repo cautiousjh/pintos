@@ -102,6 +102,7 @@ thread_init (void)
 #ifdef USERPROG
   initial_thread->parent = initial_thread;
   list_init(&initial_thread->children);
+  list_init(&initial_thread->fd_list);
 #endif
 }
 
