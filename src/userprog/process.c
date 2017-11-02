@@ -166,8 +166,8 @@ process_exit (void)
 
   // release(up) wait_sema
   if(curr_thread->parent->isWaiting)
-    sema_up(&list_entry(list_back(&curr_thread->children), 
-      struct child_thread, elem)->sema_wait);
+    sema_up( &list_entry(list_back(&curr_thread->children), 
+                         struct child_thread, elem)->sema_wait);
 
   /* Destroy the current process's page directory and switch back
      to the kernel-only page directory. */
