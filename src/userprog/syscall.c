@@ -14,9 +14,12 @@
 
 static void syscall_handler (struct intr_frame *);
 
+static struct lock file_lock;
+
 void
 syscall_init (void) 
 {
+  lock_init(&file_lock);
   intr_register_int (0x30, 3, INTR_ON, syscall_handler, "syscall");
 }
 
@@ -161,6 +164,7 @@ syscall_filesize(int fd)
 int
 syscall_read(int fd, char* buffer, off_t size)
 {
+	ASSERT_EXIT()
 	return -1;
 
 }
@@ -212,7 +216,6 @@ get_file_elem(int fd){
 }
 
 
-static struct lock file_lock;
 
 int
 set_new_fd(void){
