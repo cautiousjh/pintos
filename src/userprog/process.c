@@ -88,7 +88,8 @@ start_process (void *file_name_)
   if (!success) {
     curr_thread->parent->isChildLoaded = false;
     sema_up(&curr_thread->parent->sema_load);
-    syscall_exit(-1);
+    thread_current->exit_code = -1;
+    thread_exit();
   }
   else{
     curr_thread->parent->isChildLoaded = true;
