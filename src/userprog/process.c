@@ -505,7 +505,7 @@ setup_stack (void **esp, char *file_name, char **save_ptr)
     {
       success = install_page (((uint8_t *) PHYS_BASE) - PGSIZE, kpage, true);
       if (success){
-        *esp = PHYS_BASE;
+        *esp = PHYS_BASE-1;
 
         // argument parsing
         arg_length = strlen(file_name) + strlen(*save_ptr) + 1;
@@ -546,6 +546,10 @@ setup_stack (void **esp, char *file_name, char **save_ptr)
         i = *esp;
         *esp -= sizeof(int);
         memcpy(*esp, &i, sizeof(int));
+
+        // push argc
+        *esp -= sizeof(int);
+        memcpy(*esp, &argc, sizeof(int));
 
         // push the return address **** what???
         *esp -= sizeof(void*);
