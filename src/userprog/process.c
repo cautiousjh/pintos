@@ -166,7 +166,7 @@ process_exit (void)
 
   // release(up) wait_sema
   if(curr_thread->parent->isWaiting)
-    sema_up(list_entry(list_back(curr_thread->children), 
+    sema_up(list_entry(list_back(&curr_thread->children), 
       struct child_thread, elem)->sema_wait);
 
   /* Destroy the current process's page directory and switch back
