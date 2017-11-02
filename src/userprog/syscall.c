@@ -19,13 +19,16 @@ syscall_init (void)
 static void
 syscall_handler (struct intr_frame *f UNUSED) 
 {
-  //printf ("system call!\n");
-  //thread_exit ();
+  // is esp valid?
+  if(f->esp >= 0xc0000000 || f->esp <0x08048000 ||
+  	 (f->esp >= 0xbffffffc && *(int*)(f->esp) != SYS_HALT) )
+  	syscall_exit(-1);
 
   // system call handling
   switch(*(int*)(f->esp)){
     case SYS_HALT:	
     	shutdown_power_off();
+    	is_user_vaddr()
     	break;
     case SYS_EXIT:	
     	syscall_exit(*((int*)(f->esp)+1));
