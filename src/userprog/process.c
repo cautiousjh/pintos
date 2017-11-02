@@ -118,7 +118,7 @@ int
 process_wait (tid_t child_tid)
 {
   struct thread* curr_thread = thread_current();
-  struct child_thread* child = NULL;
+  struct child_thread* child_temp = NULL;
   struct list_elem* iter;
 
   for(iter = list_begin(&curr_thread->children);
@@ -129,17 +129,17 @@ process_wait (tid_t child_tid)
 
   if(curr_thread->isWaiting)
     return -1;
-  else if(child == NULL)
+  else if(child_temp == NULL)
     return -1;
-  else if(!child->isValid){
+  else if(!child_temp->isValid){
     curr_thread->isWaiting = true;
-    return child->exit_code;
+    return child_temp->exit_code;
   }
 
-  sema_init(&child->sema_wait,0);
+  sema_init(&child_temp->child->parent->sema_wait,0);
   curr_thread->isWaiting = true;
-  sema_down(&child->sema_wait);
-  return child->exit_code;
+  sema_down(&child_temp->child->parent->sema_wait);
+  return child_temp->exit_code;
 }
 
 /* Free the current process's resources. */
@@ -166,8 +166,7 @@ process_exit (void)
 
   // release(up) wait_sema
   if(curr_thread->parent->isWaiting)
-    sema_up( &list_entry(list_back(&curr_thread->children), 
-                         struct child_thread, elem)->sema_wait);
+    sema_up(curr_thread->parent->sema_wait);
 
   /* Destroy the current process's page directory and switch back
      to the kernel-only page directory. */

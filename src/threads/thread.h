@@ -86,7 +86,6 @@ typedef int tid_t;
 struct child_thread
 {
   struct thread *child;
-  struct semaphore sema_wait;
   struct list_elem elem;
 
   int tid;
@@ -112,6 +111,7 @@ struct thread
     /* Owned by userprog/process.c. */
     uint32_t *pagedir;                  /* Page directory. */
     struct semaphore sema_load;
+    struct semaphore sema_wait;
     struct thread *parent;
     bool isChildLoaded;
     bool isWaiting;
