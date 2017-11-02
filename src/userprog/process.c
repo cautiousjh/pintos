@@ -133,7 +133,7 @@ process_wait (tid_t child_tid)
     return -1;
   else if(!child->isValid){
     curr_thread->isWaiting = true;
-    return chlid->exit_code;
+    return child->exit_code;
   }
 
   sema_init(&child->sema_wait,0);
@@ -146,7 +146,7 @@ process_wait (tid_t child_tid)
 void
 process_exit (void)
 {
-  struct thread *cur = thread_current ();
+  struct thread *curr_thread = thread_current ();
   uint32_t *pd;
   struct list_elem* iter;
 
@@ -154,7 +154,7 @@ process_exit (void)
   for(iter = list_begin(&curr_thread->children);
       iter != list_end(&curr_thread->children);
       iter = iter->next)
-    if(iter->isValid)
+    if(list_entry(iter, struct child_thread, elem)->isValid)
       syscall_exit()
       child = list_entry(iter, struct child_thread, elem);
 
