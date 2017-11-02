@@ -100,7 +100,7 @@ thread_init (void)
   initial_thread->status = THREAD_RUNNING;
   initial_thread->tid = allocate_tid ();
 #ifdef USERPROG
-  initial_thread->parent = NULL;
+  initial_thread->parent = initial_thread;
   list_init(&initial_thread->children);
 #endif
 }
