@@ -52,9 +52,9 @@ syscall_handler (struct intr_frame *f UNUSED)
     case SYS_READ: 
     	break;//syscall_read();		break;
     case SYS_WRITE: 
-    	syscall_write(*((int*)(f->esp)+1),
-    				  *((char**)(f->esp)+2),
-    				  *((off_t*)(f->esp)+3));
+    	f->eax = syscall_write(*((int*)(f->esp)+1),
+    						  	*((char**)(f->esp)+2),
+    				  			*((off_t*)(f->esp)+3));
     	break;
     case SYS_SEEK:
     	break;//syscall_seek();		break;
