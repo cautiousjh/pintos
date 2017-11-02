@@ -155,8 +155,8 @@ process_exit (void)
       iter != list_end(&curr_thread->children);
       iter = iter->next)
     if(list_entry(iter, struct child_thread, elem)->isValid)
-      syscall_exit()
-      child = list_entry(iter, struct child_thread, elem);
+      syscall_exit(-1); //////TODO
+      //child = list_entry(iter, struct child_thread, elem);
 
 
   // close files opened
