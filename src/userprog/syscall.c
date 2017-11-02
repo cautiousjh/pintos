@@ -115,7 +115,7 @@ bool
 syscall_create(const char* name, unsigned size)
 {
 	ASSERT_EXIT(name);
-	return filesys_create(file, size, false);
+	return filesys_create(name, size, false);
 }
 
 bool 
