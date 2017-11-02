@@ -28,7 +28,6 @@ syscall_handler (struct intr_frame *f UNUSED)
   switch(*(int*)(f->esp)){
     case SYS_HALT:	
     	shutdown_power_off();
-    	is_user_vaddr()
     	break;
     case SYS_EXIT:	
     	syscall_exit(*((int*)(f->esp)+1));
