@@ -6,6 +6,7 @@
 #include "threads/interrupt.h"
 #include "threads/thread.h"
 #include "threads/synch.h"
+#include "threads/vaddr.h"
 #include "filesys/file.h"
 #include "filesys/filesys.h"
 #include "devices/shutdown.h"
@@ -165,7 +166,7 @@ int
 syscall_read(int fd, char* buffer, off_t size)
 {
 	int i;
-
+	ASSERT_EXIT(is_user_vaddr(buffer) && (buffer>0x08048000));
 	ASSERT_EXIT(fd == STDIN_FILENO || get_file_elem(fd)->this_file);
 	if(fd==STDIN_FILENO){
 		for(i=0;i<size;i++)
@@ -178,6 +179,7 @@ syscall_read(int fd, char* buffer, off_t size)
 off_t
 syscall_write(int fd, char* buffer, off_t size)
 {
+	ASSERT_EXIT(is_user_vaddr(buffer) && (buffer>0x08048000));
 	ASSERT_EXIT(fd == STDOUT_FILENO || get_file_elem(fd)->this_file);
 	if(fd==STDOUT_FILENO){
 		putbuf(buffer,size);
