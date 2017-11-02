@@ -132,14 +132,14 @@ process_wait (tid_t child_tid)
   else if(child_temp == NULL)
     return -1;
   else if(!child_temp->isValid){
-    curr_thread->isWaiting = true;
+    curr_thread->isWaiting = false;
     return child_temp->exit_code;
   }
 
-  sema_init(&child_temp->thread_pointer->parent->sema_wait,0);
-  child_temp->thread_pointer->parent->isWaiting = true;
-  sema_down(&child_temp->thread_pointer->parent->sema_wait);
-  child_temp->thread_pointer->parent->isWaiting = false;
+  sema_init(&curr_thread->sema_wait,0);
+  curr_thread->isWaiting = true;
+  sema_down(&curr_thread->sema_wait);
+  curr_thread->isWaiting = false;
   return child_temp->exit_code;
 }
 
@@ -168,6 +168,8 @@ process_exit (void)
   // release(up) wait_sema
   if(curr_thread->parent->isWaiting)
     sema_up(&curr_thread->parent->sema_wait);
+  else
+    curr_thread->isValid = false;
 
   /* Destroy the current process's page directory and switch back
      to the kernel-only page directory. */
