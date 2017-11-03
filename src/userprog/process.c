@@ -127,12 +127,10 @@ process_wait (tid_t child_tid)
     if(list_entry(iter, struct child_thread, elem)->tid == child_tid)
       child_temp = list_entry(iter, struct child_thread, elem);
 
-  if(curr_thread->isWaiting){
+  if(curr_thread->isWaiting)
     return -1;
-  }
-  else if(child_temp == NULL){
+  else if(child_temp == NULL)
     return -1;
-  }
   else if(!child_temp->isValid){
     curr_thread->isWaiting = false;
     list_remove(&child_temp->elem);
@@ -142,6 +140,7 @@ process_wait (tid_t child_tid)
   sema_init(&curr_thread->sema_wait,0);
   curr_thread->isWaiting = true;
   sema_down(&curr_thread->sema_wait);
+  list_remove(&child_temp->elem);
   if(curr_thread->isWaiting){
     curr_thread->isWaiting = false;
     return child_temp->exit_code;
@@ -166,8 +165,8 @@ process_exit (void)
     if(list_entry(iter, struct child_thread, elem)->tid == curr_thread->tid)
       child_temp = list_entry(iter, struct child_thread, elem);
       
+  // close exe file
   file_close(curr_thread->exe_file);
-  list_remove(&child_temp->elem);
 
   // release(up) wait_sema
   if(curr_thread->parent->isWaiting)
