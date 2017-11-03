@@ -173,7 +173,7 @@ process_exit (void)
       child_temp = list_entry(iter, struct child_thread, elem);
 
   // close exe file
-  //file_close(curr_thread->exe_file);
+  file_close(curr_thread->exe_file);
   // close all file
   //close_all_file(&curr_thread->fd_list);
 
