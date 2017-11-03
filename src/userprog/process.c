@@ -168,7 +168,7 @@ process_exit (void)
   // close all file
   close_all_file(&curr_thread->fd_list);
   // close exe file
-  file_close(curr_thread->exe_file);
+  //file_close(curr_thread->exe_file);
 
   // release(up) wait_sema
   if(curr_thread->parent->isWaiting)
