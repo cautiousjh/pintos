@@ -88,7 +88,7 @@ syscall_exit(int status)
 	struct list_elem* iter;
 
 	// TODO: close files opened
-	close_all_file(&curr_thread->fd_list);
+	//close_all_file(&curr_thread->fd_list);
 
 	// set exit code
 	for(iter = list_begin(&curr_thread->parent->children);
