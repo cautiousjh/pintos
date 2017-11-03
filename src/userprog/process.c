@@ -139,8 +139,12 @@ process_wait (tid_t child_tid)
   sema_init(&curr_thread->sema_wait,0);
   curr_thread->isWaiting = true;
   sema_down(&curr_thread->sema_wait);
-  curr_thread->isWaiting = false;
-  return child_temp->exit_code;
+  if(curr_thread->isWaiting){
+    curr_thread->isWaiting = false;
+    return child_temp->exit_code;
+  }
+  else
+    return -1;
 }
 
 /* Free the current process's resources. */
