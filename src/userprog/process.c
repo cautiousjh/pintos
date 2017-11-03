@@ -133,7 +133,7 @@ process_wait (tid_t child_tid)
     return -1;
   else if(!child_temp->isValid){
     curr_thread->isWaiting = false;
-    return -1;
+    return child_temp->exit_code;
   }
 
   sema_init(&curr_thread->sema_wait,0);
