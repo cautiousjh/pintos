@@ -250,8 +250,23 @@ bool close_file(int fd)
 }
 
 // NOT IMPLEMENTED
-void close_all_file()
+void close_all_file(struct list* fd_list)
 {
+	struct list_elem* iter;
+	struct file_elem* felem;
+
+	if(list_empty(fd_list))
+		return;
+
+	for(iter = list_begin(fd_list);
+		iter != list_end(fd_list);
+		iter = iter->next){
+		felem = list_entry(iter, struct file_elem, elem);
+		file_close(felem->this_file);
+		list_remove(iter);
+		free(felem);
+	}
+	list_init(fd_list);
 }
 
 

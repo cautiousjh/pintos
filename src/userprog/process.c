@@ -164,7 +164,9 @@ process_exit (void)
       iter = iter->next)
     if(list_entry(iter, struct child_thread, elem)->tid == curr_thread->tid)
       child_temp = list_entry(iter, struct child_thread, elem);
-      
+
+  // close all file
+  close_all_file(&curr_thread->fd_list);
   // close exe file
   file_close(curr_thread->exe_file);
 
