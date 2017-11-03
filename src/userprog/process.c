@@ -133,12 +133,14 @@ process_wait (tid_t child_tid)
     return -1;
   else if(!child_temp->isValid){
     curr_thread->isWaiting = false;
+    list_remove(&child_temp->elem);
     return child_temp->exit_code;
   }
 
   sema_init(&curr_thread->sema_wait,0);
   curr_thread->isWaiting = true;
   sema_down(&curr_thread->sema_wait);
+  list_remove(&child_temp->elem);
   if(curr_thread->isWaiting){
     curr_thread->isWaiting = false;
     return child_temp->exit_code;
@@ -156,21 +158,13 @@ process_exit (void)
   struct list_elem* iter;
   struct child_thread* child_temp;
 
-  // kill all children
-  //for(iter = list_begin(&curr_thread->children);
-  //    iter != list_end(&curr_thread->children);
-  //    iter = iter->next)
-  //  if(list_entry(iter, struct child_thread, elem)->isValid)
-  //    syscall_exit(-1); //////TODO
-      //child = list_entry(iter, struct child_thread, elem);
-
   // find itself in parent's children list
   for(iter = list_begin(&curr_thread->parent->children);
       iter != list_end(&curr_thread->parent->children);
       iter = iter->next)
     if(list_entry(iter, struct child_thread, elem)->tid == curr_thread->tid)
       child_temp = list_entry(iter, struct child_thread, elem);
-      //TODO which thread waiting for?
+      
   // close exe file
   file_close(curr_thread->exe_file);
 
