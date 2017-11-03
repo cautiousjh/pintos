@@ -128,11 +128,9 @@ process_wait (tid_t child_tid)
       child_temp = list_entry(iter, struct child_thread, elem);
 
   if(curr_thread->isWaiting){
-    list_remove(&child_temp->elem);
     return -1;
   }
   else if(child_temp == NULL){
-    list_remove(&child_temp->elem);
     return -1;
   }
   else if(!child_temp->isValid){
