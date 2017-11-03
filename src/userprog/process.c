@@ -167,7 +167,7 @@ process_exit (void)
 
   // close children
   for(iter = list_begin(&child_temp->thread_pointer->children);
-      iter != list_end(&curr_thread->thread_pointer->children);
+      iter != list_end(&child_temp->thread_pointer->children);
       iter = iter->next)
     free(list_entry(iter, struct child_thread, elem));
 
