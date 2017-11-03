@@ -90,14 +90,13 @@ syscall_exit(int status)
 	// TODO: close files opened
 
 	// set exit code
-	for(iter = list_begin(&curr_thread->children);
-	    iter != list_end(&curr_thread->children);
+	for(iter = list_begin(&curr_thread->parent->children);
+	    iter != list_end(&curr_thread->parent->children);
 	    iter = iter->next)
-		if(list_entry(iter, struct child_thread, elem)->tid == curr_thread->tid){
-	    	list_entry(iter, struct child_thread, elem)->exit_code = status;
-	    	break;
-		}
-		
+	  if(list_entry(iter, struct child_thread, elem)->tid == curr_thread->tid){
+	    list_entry(iter, struct child_thread, elem)->exit_code = status;
+	    break;
+	  }
 	printf ("%s: exit(%d)\n", curr_thread->name, status);
 	thread_exit();
 }
