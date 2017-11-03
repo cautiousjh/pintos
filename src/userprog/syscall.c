@@ -254,6 +254,7 @@ bool close_file(int fd)
 void close_all_file(struct list* fd_list)
 {
 	struct list_elem* iter;
+	struct list_elm* next;
 	struct file_elem* felem;
 
 	if(list_empty(fd_list))
@@ -261,7 +262,8 @@ void close_all_file(struct list* fd_list)
 
 	for(iter = list_begin(fd_list);
 		iter != list_end(fd_list);
-		iter = iter->next){
+		iter = next){
+		next = iter->next;
 		felem = list_entry(iter, struct file_elem, elem);
 		file_close(felem->this_file);
 		list_remove(iter);
