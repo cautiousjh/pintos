@@ -120,6 +120,7 @@ process_wait (tid_t child_tid)
   struct thread* curr_thread = thread_current();
   struct child_thread* child_temp = NULL;
   struct list_elem* iter;
+  int exit_code;
 
   for(iter = list_begin(&curr_thread->children);
       iter != list_end(&curr_thread->children);
@@ -133,17 +134,23 @@ process_wait (tid_t child_tid)
     return -1;
   else if(!child_temp->isValid){
     curr_thread->isWaiting = false;
+    exit_code = child_temp->exit_code;
     list_remove(&child_temp->elem);
-    return child_temp->exit_code;
+    free(child_temp);
+    return exit_code;
   }
 
   sema_init(&curr_thread->sema_wait,0);
   curr_thread->isWaiting = true;
   sema_down(&curr_thread->sema_wait);
+
+  exit_code = child_temp->exit_code;
   list_remove(&child_temp->elem);
+  free(child_temp);
+
   if(curr_thread->isWaiting){
     curr_thread->isWaiting = false;
-    return child_temp->exit_code;
+    return exit_code;
   }
   else
     return -1;
@@ -164,12 +171,6 @@ process_exit (void)
       iter = iter->next)
     if(list_entry(iter, struct child_thread, elem)->tid == curr_thread->tid)
       child_temp = list_entry(iter, struct child_thread, elem);
-
-  // close children
-  for(iter = list_begin(&curr_thread->children);
-      iter != list_end(&curr_thread->children);
-      iter = iter->next)
-    free(list_entry(iter, struct child_thread, elem));
 
   // close all file
   //close_all_file(&curr_thread->fd_list);
