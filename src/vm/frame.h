@@ -18,7 +18,7 @@ struct frame{
 	struct hash_elem elem;
 };
 
-void frames_init();
+void frames_init(void);
 void* frame_alloc(struct frame* f);
 void* frame_evict(struct frame* f);
 

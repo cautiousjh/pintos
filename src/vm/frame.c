@@ -4,10 +4,10 @@
 #include "threads/palloc.h"
 
 void
-frames_init()
+frames_init(void)
 {
 	lock_init(&vmlock);
-	hash_init(&frames, frame_hash_func, frame_less_func);
+	hash_init(&frames, frame_hash_func, frame_less_func, NULL);
 }
 
 void*
@@ -36,11 +36,11 @@ frame_hash_func(const struct hash_elem *e,void *aux)
 }
 
 bool 
-frame_less_func(const struct hash_elem *a,
-                const struct hash_elem *b,
+frame_less_func(const struct hash_elem *_a,
+                const struct hash_elem *_b,
                 void *aux)
 {
-	struct frame* a = hash_entry(a, struct frame, elem);
-	struct frame* b = hash_entry(b, struct frame, elem);
+	struct frame* a = hash_entry(_a, struct frame, elem);
+	struct frame* b = hash_entry(_b, struct frame, elem);
 	return a->upage != b->upage? a->upage < b->upage : a->t->tid < b->t->tid;
 }
