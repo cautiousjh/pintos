@@ -7,7 +7,6 @@
 #include "devices/block.h"
 #include "filesys/off_t.h"
 
-static struct lock frame_lock;
 static struct hash frames;
 
 

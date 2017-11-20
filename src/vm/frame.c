@@ -3,6 +3,8 @@
 
 #include "threads/palloc.h"
 
+static struct lock frame_lock;
+
 void
 frames_init(void)
 {
