@@ -491,11 +491,11 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
 
       /* Get a page of memory. */
       struct frame* new_frame = malloc(sizeof(struct frame));
-      new_frame->uaddr = upage;
+      new_frame->upage = upage;
       uint8_t *kpage = frame_alloc(new_frame);
       if (kpage == NULL)
         return false;
-      hash_insert(&frames,&new_frame->hash_elem);
+      hash_insert(&frames,&new_frame->elem);
 
       /* Load this page. */
       if (file_read (file, kpage, page_read_bytes) != (int) page_read_bytes)
