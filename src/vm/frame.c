@@ -3,14 +3,14 @@
 
 #include "threads/palloc.h"
 
-void
+static void
 frames_init()
 {
 	lock_init(&vmlock);
 	hash_init(&frames, frame_hash_func, frame_less_func);
 }
 
-void*
+static void*
 frame_alloc(struct frame* f)
 {
 	void* new_frame = palloc_get_page(PAL_USER);
@@ -22,7 +22,7 @@ frame_alloc(struct frame* f)
 
 }
 
-void* 
+static void* 
 frame_evict(struct frame* f)
 {
 	return NULL;

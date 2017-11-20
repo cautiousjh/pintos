@@ -18,9 +18,9 @@ struct frame{
 	struct hash_elem elem;
 }
 
-void frames_init();
-void* frame_alloc(struct frame* f);
-void* frame_evict(struct frame* f);
+static void frames_init();
+static void* frame_alloc(struct frame* f);
+static void* frame_evict(struct frame* f);
 
 unsigned frame_hash_func(const struct hash_elem *e,void *aux);
 bool frame_less_func(const struct hash_elem *a,
