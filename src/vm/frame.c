@@ -6,21 +6,34 @@
 void
 frames_init(void)
 {
-	lock_init(&vmlock);
+	lock_init(&frame_lock);
 	hash_init(&frames, frame_hash_func, frame_less_func, NULL);
 }
 
 void*
 frame_alloc(struct frame* f)
 {
-	void* new_frame = palloc_get_page(PAL_USER);
+	void* new_frame;
+
+	lock_acquire(&frame_lock);
+	new_frame = palloc_get_page(PAL_USER);
 	f->t = thread_current();
+	lock_release(&frame_lock);
 	if(new_frame)
 		return f->kpage = new_frame;
 	else
 		return frame_evict(f);
 
 }
+
+void
+free_frame (struct frame* f)
+{
+	lock_acquire(&frame_lock);
+	palloc_free_page(f->kpage);
+	lock_release(&frame_lock);
+}
+
 
 void* 
 frame_evict(struct frame* f)

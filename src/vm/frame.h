@@ -7,7 +7,7 @@
 #include "devices/block.h"
 #include "filesys/off_t.h"
 
-static struct lock vmlock;
+static struct lock frame_lock;
 static struct hash frames;
 
 
@@ -21,6 +21,7 @@ struct frame{
 void frames_init(void);
 void* frame_alloc(struct frame* f);
 void* frame_evict(struct frame* f);
+void free_frame (struct frame* f);
 
 unsigned frame_hash_func(const struct hash_elem *e,void *aux);
 bool frame_less_func(const struct hash_elem *a,
