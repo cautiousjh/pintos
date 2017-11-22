@@ -528,10 +528,12 @@ setup_stack (void **esp, char *file_name, char **save_ptr)
 
   struct thread* curr_thread = thread_current();
 
-  //frame and page setting
-  struct frame* new_frame = (struct frame*)malloc(sizeof(struct frame));
-  struct page* new_page = (struct page*)malloc(sizeof(struct page));
+  //frame allocation
+  struct frame* new_frame;
   kpage = frame_alloc(&new_frame);
+
+  //page setting
+  struct page* new_page = (struct page*)malloc(sizeof(struct page));
   new_frame->related_page = new_page;
 
   new_page->addr = PHYS_BASE - PGSIZE;

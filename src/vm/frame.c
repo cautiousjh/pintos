@@ -13,17 +13,18 @@ frames_init(void)
 }
 
 void*
-frame_alloc(struct frame* f)
+frame_alloc(struct frame* new_frame)
 {
-	void* new_frame;
+	new_frame = (struct frame*)malloc(sizeof(struct frame));
 
 	lock_acquire(&frame_lock);
-	new_frame = palloc_get_page(PAL_USER | PAL_ZERO);
-	f->t = thread_current();
+	new_frame->kpage = palloc_get_page(PAL_USER | PAL_ZERO);
+	new_frame->t = thread_current();
 	lock_release(&frame_lock);
-	if(new_frame){
+
+	if(new_frame->kpage){
       	hash_insert(&frames,&new_frame->elem);
-		return f->kpage = new_frame;
+		return f->kpage;
 	}
 	else
 		return frame_evict(f);
