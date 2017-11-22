@@ -3,7 +3,7 @@
 #include "userprog/process.h"
 #include <inttypes.h>
 #include <stdio.h>
-#include <string.c>
+#include <string.h>
 #include "userprog/gdt.h"
 #include "threads/interrupt.h"
 #include "threads/thread.h"
