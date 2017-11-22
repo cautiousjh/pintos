@@ -7,7 +7,7 @@
 #include "devices/block.h"
 #include "filesys/off_t.h"
 
-static struct hash frames;
+struct hash frames;
 
 
 struct frame{
