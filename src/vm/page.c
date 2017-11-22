@@ -31,13 +31,13 @@ page_table_lookup(void* address)
 	struct hash_elem *e;
 
 	target.addr = pg_no(address) << PGBITS; //page start addr
-	e= hash_find(&curr_thread->page_table, &p.elem);
+	e= hash_find(&curr_thread->page_table, &target.elem);
 	return e==NULL ? NULL : hasy_entry(e, struct page, elem);
 }
 
 
 unsigned
-page_hash_func(const struct hash_elem *e,void *aux)
+page_hash_func(const struct hash_elem *e,void *aux UNUSED)
 {
 	const struct page* p = hash_entry(e, struct page, elem);
 	return hash_bytes(&p->addr, sizeof(p->addr));
@@ -46,7 +46,7 @@ page_hash_func(const struct hash_elem *e,void *aux)
 bool 
 page_less_func(const struct hash_elem *_a,
                 const struct hash_elem *_b,
-                void *aux)
+                void *aux UNUSED)
 {
 	struct page* a = hash_entry(_a, struct page, elem);
 	struct page* b = hash_entry(_b, struct page, elem);
