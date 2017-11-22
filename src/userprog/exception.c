@@ -175,7 +175,7 @@ page_fault (struct intr_frame *f)
     }
 
     fault_page->status = IN_FRAME_TABLE;
-    fault_page->frame = new_frame;
+    fault_page->frame_entry = new_frame;
     if(success)
       return;
   }
