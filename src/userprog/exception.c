@@ -151,9 +151,7 @@ page_fault (struct intr_frame *f)
   ///////////// newly added parts for VM //////////////////
   struct page *fault_page = page_table_lookup(fault_addr);
 
-  
-  switch(fault_page->status){
-  case IN_FILESYS:
+  if (fault_page->status == IN_FILESYS){
     struct frame* new_frame;
     frame_alloc(new_frame);
     new_frame->related_page = fault_page;
