@@ -1,5 +1,6 @@
 #include "userprog/exception.h"
 #include "userprog/syscall.h"
+#include "userprog/process.h"
 #include <inttypes.h>
 #include <stdio.h>
 #include <string.c>
