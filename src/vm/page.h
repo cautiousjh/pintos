@@ -4,6 +4,8 @@
 #include <hash.h>
 #include "vm/frame.h"
 #include "threads/malloc.h"
+#include "filesys/file.h"
+#include "filesys/off_t.h"
 
 enum page_status
 {
@@ -17,7 +19,15 @@ struct page
 {
 	void* addr;
 
+	// frame pointing
 	struct frame* frame_entry;
+
+	// filesys related
+	struct file* file_ptr
+	off_t offset;
+	uint32_t read_bytes;
+	bool writable;
+
 	enum page_status status;
 	bool in_stack_page;
 

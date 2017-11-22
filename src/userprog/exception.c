@@ -147,11 +147,29 @@ page_fault (struct intr_frame *f)
   ///////////// newly added parts for VM //////////////////
   struct page *fault_page = page_table_lookup(fault_addr);
 
-  if(fault_page){ // inside of stack range
+  
+  switch(fault_page->status){
+  case IN_FILESYS:
+    struct frame* new_frame;
+    frame_alloc(&new_frame);
+    new_frame->related_page = fault_page;
 
-  }
-  else{ 
+    // load the page
+    if(file_read(fault_page->file_ptr, new_frame->kpage, fault_page->read_bytes) !=
+        (int) fault_page->read_bytes)
+    {
+      free_frame(new_frame);
+      break;
+    }
+    memset (new_frame->kpage + fault_page->read_bytes, 0, PGSIZE - fault_page->read_bytes);
 
+    // install page into frame
+    if(!install_page(fault_page->addr, new_frame->kpage, fault_page->writable))
+    {
+      free_frame(new_frame);
+      break;
+    }
+    return;
   }
 
 
