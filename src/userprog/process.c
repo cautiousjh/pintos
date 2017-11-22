@@ -496,7 +496,7 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
       size_t page_read_bytes = read_bytes < PGSIZE ? read_bytes : PGSIZE;
       size_t page_zero_bytes = PGSIZE - page_read_bytes;
 
-      struct page* new_page = (strcut page*)malloc(sizeof(struct page));
+      struct page* new_page = (struct page*)malloc(sizeof(struct page));
       if(!new_page){ // no space for malloc
         free(new_page);
         return false;
@@ -526,17 +526,19 @@ setup_stack (void **esp, char *file_name, char **save_ptr)
   char **argv_addr;
   int  arg_length, argc=1, i, j;
 
+  struct thread* curr_thread = thread_current();
+
   //frame and page setting
-  struct frame* new_frame = malloc(sizeof(struct frame));
-  struct page* new_page = malloc(sizeof(struct page));
+  struct frame* new_frame = (struct frame*)malloc(sizeof(struct frame));
+  struct page* new_page = (struct page*)malloc(sizeof(struct page));
   kpage = frame_alloc(&new_frame);
   new_frame->related_page = new_page;
 
-  p->addr = PHYS_BASE - PGSIZE;
-  p->frame_entry = new_frame;
-  p->status = IN_FRAME_TABLE;
+  new_page->addr = PHYS_BASE - PGSIZE;
+  new_page->frame_entry = new_frame;
+  new_page->status = IN_FRAME_TABLE;
   new_page->in_stack_page = true;
-  add_page(curr_thread,&new_page);
+  add_page(curr_thread, &new_page);
 
   if (kpage != NULL) 
     {
