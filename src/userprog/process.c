@@ -19,6 +19,7 @@
 #include "threads/thread.h"
 #include "threads/vaddr.h"
 #include "vm/frame.h"
+#include "vm/page.h"
 
 static thread_func start_process NO_RETURN;
 static bool load (const char *cmdline, void (**eip) (void), void **esp);
@@ -76,6 +77,8 @@ start_process (void *file_name_)
   char *file_name = file_name_;
   struct intr_frame if_;
   bool success;
+
+  page_table_init (&curr_thread->page_table);
 
   /* Initialize interrupt frame and load executable. */
   memset (&if_, 0, sizeof if_);
@@ -165,6 +168,8 @@ process_exit (void)
   uint32_t *pd;
   struct list_elem* iter;
   struct child_thread* child_temp;
+
+  page_table_destroy (&curr_thread->page_table);
 
   // find itself in parent's children list
   for(iter = list_begin(&curr_thread->parent->children);
@@ -480,6 +485,8 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
   ASSERT (pg_ofs (upage) == 0);
   ASSERT (ofs % PGSIZE == 0);
 
+  struct thread* curr_thread = thread_current();
+
   file_seek (file, ofs);
   while (read_bytes > 0 || zero_bytes > 0) 
     {
@@ -489,28 +496,16 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
       size_t page_read_bytes = read_bytes < PGSIZE ? read_bytes : PGSIZE;
       size_t page_zero_bytes = PGSIZE - page_read_bytes;
 
-      /* Get a page of memory. */
-      struct frame* new_frame = malloc(sizeof(struct frame));
-      new_frame->upage = upage;
-      uint8_t *kpage = frame_alloc(new_frame);
-      if (kpage == NULL)
+      struct page* new_page = (strcut page*)malloc(sizeof(struct page));
+      if(!new_page){ // no space for malloc
+        free(new_page);
         return false;
-      hash_insert(&frames,&new_frame->elem);
-
-      /* Load this page. */
-      if (file_read (file, kpage, page_read_bytes) != (int) page_read_bytes)
-        {
-          free_frame (new_frame);
-          return false; 
-        }
-      memset (kpage + page_read_bytes, 0, page_zero_bytes);
-
-      /* Add the page to the process's address space. */
-      if (!install_page (upage, kpage, writable)) 
-        {
-          free_frame (new_frame);
-          return false; 
-        }
+      }
+      new_page->addr = upage;
+      new_page->frame_entry = NULL;
+      new_page->status = IN_FILESYS;
+      new_page->in_stack_page = false;
+      page_insert(curr_thread,&new_page);
 
       /* Advance. */
       read_bytes -= page_read_bytes;
@@ -531,7 +526,18 @@ setup_stack (void **esp, char *file_name, char **save_ptr)
   char **argv_addr;
   int  arg_length, argc=1, i, j;
 
-  kpage = palloc_get_page (PAL_USER | PAL_ZERO);
+  //frame and page setting
+  struct frame* new_frame = malloc(sizeof(struct frame));
+  struct page* new_page = malloc(sizeof(struct page));
+  kpage = frame_alloc(&new_frame);
+  new_frame->related_page = new_page;
+
+  p->addr = PHYS_BASE - PGSIZE;
+  p->frame_entry = new_frame;
+  p->status = IN_FRAME_TABLE;
+  new_page->in_stack_page = true;
+  add_page(curr_thread,&new_page);
+
   if (kpage != NULL) 
     {
       success = install_page (((uint8_t *) PHYS_BASE) - PGSIZE, kpage, true);

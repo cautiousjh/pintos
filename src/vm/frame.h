@@ -14,6 +14,7 @@ struct frame{
 	void* kpage;
 	void* upage;
 	struct thread* t;
+	struct page* related_page;
 	struct hash_elem elem;
 };
 

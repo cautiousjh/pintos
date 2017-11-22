@@ -6,6 +6,7 @@
 #include <stdint.h>
 
 #include "threads/synch.h"
+#include "vm/page.h"
 
 /* States in a thread's life cycle. */
 enum thread_status
@@ -118,6 +119,10 @@ struct thread
     struct file* exe_file;
     struct list children;
     struct list fd_list;
+#endif
+
+#ifdef VM
+    struct hash page_table;
 #endif
 
     /* Owned by thread.c. */
