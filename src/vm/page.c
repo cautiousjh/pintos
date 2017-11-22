@@ -30,7 +30,7 @@ page_table_lookup(void* address)
 	struct page target;
 	struct hash_elem *e;
 
-	target.addr = pg_no(address) << PGBITS; //page start addr
+	target.addr = address; //page start addr
 	e= hash_find(&curr_thread->page_table, &target.elem);
 	return e==NULL ? NULL : hash_entry(e, struct page, elem);
 }
@@ -50,6 +50,6 @@ page_less_func(const struct hash_elem *_a,
 {
 	struct page* a = hash_entry(_a, struct page, elem);
 	struct page* b = hash_entry(_b, struct page, elem);
-	return pg_no(a->addr) < pg_no(b->addr);
+	return a->addr < b->addr;
 }
 
