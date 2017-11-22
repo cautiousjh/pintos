@@ -144,9 +144,16 @@ page_fault (struct intr_frame *f)
   /* Count page faults. */
   page_fault_cnt++;
 
-  // newly added parts for VM
-  
-  
+  ///////////// newly added parts for VM //////////////////
+  struct page *fault_page = page_table_lookup(fault_addr);
+
+  if(fault_page){ // inside of stack range
+
+  }
+  else{ 
+
+  }
+
 
   /* Determine cause. */
   not_present = (f->error_code & PF_P) == 0;

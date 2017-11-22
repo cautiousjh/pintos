@@ -8,19 +8,31 @@
 void
 page_table_init(struct hash* page_table)
 {
-	hash_init(&page_table, page_hash_func, page_less_func, NULL);
+	hash_init(page_table, page_hash_func, page_less_func, NULL);
 }
 
 void
 page_table_destroy(struct hash* page_table)
 {
-
+	return;
 }
 
 void
 add_page(struct thread* t, struct page* p)
 {
 	hash_insert(&t->page_table, &p->elem);
+}
+
+struct page*
+page_table_lookup(void* address)
+{
+	struct thread* curr_thread = thread_current();
+	struct page target;
+	struct hash_elem *e;
+
+	target.addr = pg_no(address) << PGBITS; //page start addr
+	e=e hash_find(&curr_thread->page_table, &p.elem);
+	return e==NULL ? NULL : hasy_entry(e, struct page, elem);
 }
 
 

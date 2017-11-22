@@ -31,6 +31,8 @@ void page_table_destroy(struct hash* page_table);
 
 void add_page(struct thread* t, struct page* p);
 
+struct page* page_table_lookup(void* address);
+
 unsigned page_hash_func(const struct hash_elem *e,void *aux);
 
 bool page_less_func(const struct hash_elem *_a,
