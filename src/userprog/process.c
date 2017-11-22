@@ -503,7 +503,7 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
       }
       new_page->addr = upage;
       new_page->frame_entry = NULL;
-      new_page-> = file;
+      new_page->file_ptr = file;
       new_page->offset = ofs;
       new_page->read_bytes = read_bytes;
       new_page->writable = writable;
@@ -534,7 +534,7 @@ setup_stack (void **esp, char *file_name, char **save_ptr)
 
   //frame allocation
   struct frame* new_frame;
-  kpage = frame_alloc(&new_frame);
+  kpage = frame_alloc(new_frame);
 
   //page setting
   struct page* new_page = (struct page*)malloc(sizeof(struct page));
@@ -544,7 +544,7 @@ setup_stack (void **esp, char *file_name, char **save_ptr)
   new_page->frame_entry = new_frame;
   new_page->status = IN_FRAME_TABLE;
   new_page->in_stack_page = true;
-  add_page(curr_thread, &new_page);
+  add_page(curr_thread, new_page);
 
   if (kpage != NULL) 
     {

@@ -151,7 +151,7 @@ page_fault (struct intr_frame *f)
   switch(fault_page->status){
   case IN_FILESYS:
     struct frame* new_frame;
-    frame_alloc(&new_frame);
+    frame_alloc(new_frame);
     new_frame->related_page = fault_page;
 
     // load the page
