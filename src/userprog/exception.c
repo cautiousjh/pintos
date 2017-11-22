@@ -152,6 +152,7 @@ page_fault (struct intr_frame *f)
   struct page *fault_page = page_table_lookup(fault_addr);
 
   if (fault_page->status == IN_FILESYS){
+    bool success = true;
     struct frame* new_frame;
     frame_alloc(new_frame);
     new_frame->related_page = fault_page;
@@ -161,7 +162,7 @@ page_fault (struct intr_frame *f)
         (int) fault_page->read_bytes)
     {
       free_frame(new_frame);
-      break;
+      success = false;
     }
     memset (new_frame->kpage + fault_page->read_bytes, 0, PGSIZE - fault_page->read_bytes);
 
@@ -169,9 +170,10 @@ page_fault (struct intr_frame *f)
     if(!install_page(fault_page->addr, new_frame->kpage, fault_page->writable))
     {
       free_frame(new_frame);
-      break;
+      success = false;
     }
-    return;
+    if(success)
+      return;
   }
 
 
