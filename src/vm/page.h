@@ -23,7 +23,7 @@ struct page
 	struct frame* frame_entry;
 
 	// filesys related
-	struct file* file_ptr
+	struct file* file_ptr;
 	off_t offset;
 	uint32_t read_bytes;
 	bool writable;
