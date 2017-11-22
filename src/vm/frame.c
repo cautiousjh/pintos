@@ -24,10 +24,10 @@ frame_alloc(struct frame* new_frame)
 
 	if(new_frame->kpage){
       	hash_insert(&frames,&new_frame->elem);
-		return f->kpage;
+		return new_frame->kpage;
 	}
 	else
-		return frame_evict(f);
+		return frame_evict(new_frame);
 
 }
 

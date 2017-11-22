@@ -4,6 +4,7 @@
 #include <hash.h>
 #include "threads/thread.h"
 #include "threads/synch.h"
+#include "threads/malloc.h"
 #include "devices/block.h"
 #include "filesys/off_t.h"
 

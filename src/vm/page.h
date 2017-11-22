@@ -3,6 +3,7 @@
 
 #include <hash.h>
 #include "vm/frame.h"
+#include "threads/malloc.h"
 
 enum page_status
 {
