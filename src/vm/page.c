@@ -32,7 +32,7 @@ page_table_lookup(void* address)
 
 	target.addr = pg_no(address) << PGBITS; //page start addr
 	e= hash_find(&curr_thread->page_table, &target.elem);
-	return e==NULL ? NULL : hasy_entry(e, struct page, elem);
+	return e==NULL ? NULL : hash_entry(e, struct page, elem);
 }
 
 
