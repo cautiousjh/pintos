@@ -173,6 +173,9 @@ page_fault (struct intr_frame *f)
       free_frame(new_frame);
       success = false;
     }
+
+    fault_page->status = IN_FRAME_TABLE;
+    fault_page->frame = new_frame;
     if(success)
       return;
   }
