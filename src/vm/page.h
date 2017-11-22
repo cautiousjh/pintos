@@ -6,10 +6,10 @@
 
 enum page_status
 {
-	ALL_ZERO;
-	IN_FILESYS;
-	IN_FRAME_TABLE;
-	IN_SWAP_TABLE;
+	ALL_ZERO,
+	IN_FILESYS,
+	IN_FRAME_TABLE,
+	IN_SWAP_TABLE,
 };
 
 struct page
