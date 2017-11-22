@@ -505,7 +505,7 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
       new_page->frame_entry = NULL;
       new_page->status = IN_FILESYS;
       new_page->in_stack_page = false;
-      page_insert(curr_thread,&new_page);
+      add_page(curr_thread,&new_page);
 
       /* Advance. */
       read_bytes -= page_read_bytes;
