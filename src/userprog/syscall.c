@@ -195,6 +195,8 @@ syscall_write(int fd, char* buffer, off_t size)
 		putbuf(buffer,size);
 		return size;
 	}
+
+  	pagedir_set_dirty(->pagedir, kpage, false);
 	return file_write(get_file_elem(fd)->this_file, buffer, size);
 }
 void
