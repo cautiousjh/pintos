@@ -178,6 +178,7 @@ page_fault (struct intr_frame *f)
     frame_alloc(new_frame);
     pagedir_set_dirty(new_frame->t->pagedir, new_frame->kpage, false);
     new_frame->related_page = fault_page;
+    fault_page->status = IN_FRAME_TABLE;
 
     // load the page
     if(file_read_at(fault_page->file_ptr, new_frame->kpage,
