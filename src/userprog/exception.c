@@ -175,7 +175,7 @@ page_fault (struct intr_frame *f)
     struct frame* new_frame;
     new_frame = (struct frame*)malloc(sizeof(struct frame));
     frame_alloc(new_frame);
-    pagedir_set_dirty(curr_thread->pagedir, kpage, false);
+    pagedir_set_dirty(curr_thread->pagedir, new_frame->kpage, false);
     new_frame->related_page = fault_page;
 
     // load the page
