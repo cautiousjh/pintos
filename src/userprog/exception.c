@@ -149,7 +149,14 @@ page_fault (struct intr_frame *f)
   /* Count page faults. */
   page_fault_cnt++;
 
-  ///////////// newly added parts for VM //////////////////
+  // check whether fault_page is valid or not
+  if (fault_addr == NULL || is_kernel_vaddr(fault_addr))
+    syscall_exit(-1);
+  // stack range check
+  if(fault_addr > PHYS_BASE) /* || under the stack? */
+    syscall_exit(-1);
+
+  // newly added parts for VM
   struct page *fault_page = page_table_lookup(fault_addr);
 
   if (fault_page->status == IN_FILESYS){
