@@ -236,12 +236,11 @@ stack_growth(void* fault_addr)
   frame_alloc(new_frame);
   new_frame->related_page = new_page;
 
-  curr_thread->esp -= PGSIZE;
   curr_thread->stack_page_cnt++;
+  curr_thread->esp = (uint8_t *)PHYS_BASE - curr_thread->stack_page_cnt * PGSIZE;
 
   // setting
-  new_page->addr = (void*)((uintptr_t)fault_addr << PGBITS);
-
+  new_page->addr = curr_thread->esp;
   new_page->frame_entry = new_frame;
   new_page->writable = true;
   new_page->status = IN_FRAME_TABLE;
