@@ -534,7 +534,7 @@ setup_stack (void **esp, char *file_name, char **save_ptr)
   //frame allocation
   struct frame* new_frame;
   new_frame = (struct frame*)malloc(sizeof(struct frame));
-  while(!kpage) {kpage = frame_alloc(new_frame)};
+  while(!kpage) {kpage = frame_alloc(new_frame);}
   pagedir_set_accessed(curr_thread->pagedir, kpage, true);
   pagedir_set_dirty(curr_thread->pagedir, kpage, false);
 
