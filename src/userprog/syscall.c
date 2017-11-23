@@ -367,14 +367,14 @@ syscall_munmap (mapid_t mmapid)
 	struct thread* curr_thread = thread_current();
 
 	// mmapid validation
-	if(mmapid > curr_thrad->mmapid_cnt)
+	if(mmapid > curr_thread->mmapid_cnt)
 		return;
 
 	lock_acquire(&file_lock);
 
 	// find file_elem
-	for(iter = list_begin(curr_thread->fd_list);
-		iter!= list_end(fd_list);
+	for(iter = list_begin(&curr_thread->fd_list);
+		iter!= list_end(&curr_thread->fd_list);
 		iter = iter->next){
 		felem = list_entry(iter, struct file_elem, elem);
 		if(felem->mmapid == mmapid)
@@ -382,7 +382,7 @@ syscall_munmap (mapid_t mmapid)
 	}
 
 	// iterate each page
-	if(iter != list_end(fd_list)){
+	if(iter != list_end(&curr_thread->fd_list)){
 		file_size = file_length(felem->this_file);
 		for(ofs=0; ofs<file_size; ofs+=PGSIZE){
 			size_t bytes = ofs+PGSIZE < file_size? PGSIZE : file_size-ofs;
