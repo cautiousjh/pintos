@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "userprog/gdt.h"
+#include "userprog/pagedir.h"
 #include "threads/interrupt.h"
 #include "threads/thread.h"
 #include "threads/vaddr.h"
@@ -175,7 +176,7 @@ page_fault (struct intr_frame *f)
     struct frame* new_frame;
     new_frame = (struct frame*)malloc(sizeof(struct frame));
     frame_alloc(new_frame);
-    pagedir_set_dirty(curr_thread->pagedir, new_frame->kpage, false);
+    pagedir_set_dirty(new_frame->t->pagedir, new_frame->kpage, false);
     new_frame->related_page = fault_page;
 
     // load the page
