@@ -303,7 +303,6 @@ syscall_mmap (int fd, void *addr)
 	struct thread* curr_thread = thread_current();
 	size_t ofs;
 
-	filesys_lock
 	// fd, addr0, addr aligned validation
 	if(fd<=1 || addr == NULL || !pg_ofs(addr))
 		return -1;
