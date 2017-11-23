@@ -80,7 +80,7 @@ syscall_handler (struct intr_frame *f UNUSED)
     	syscall_close(*((char**)(f->esp)+1)); 
      	break;
     case SYS_MMAP:
-    	f->eax = syscall_mmap(*((int*)(f->esp)+1),*((void *)(f->esp)+2));
+    	f->eax = syscall_mmap(*((int*)(f->esp)+1),*((unsigned*)(f->esp)+2));
     	break;
     case SYS_MUNMAP:
     	syscall_munmap(*((mapid_t*)(f->esp)+1));
