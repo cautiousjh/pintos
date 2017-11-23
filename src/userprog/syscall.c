@@ -334,7 +334,7 @@ syscall_mmap (int fd, void *addr)
 	// page mapping
 	for(ofs = 0; ofs < file_size; ofs+=PGSIZE){
 		size_t read_bytes = ofs+PGSIZE < file_size? PGSIZE : file_size-ofs;
-		size_t zero_bytes = PG_SIZE - read_bytes;
+		size_t zero_bytes = PGSIZE - read_bytes;
 
 		struct page* new_page = (struct page*)malloc(sizeof(struct page));
 		new_page->addr = addr + ofs;
