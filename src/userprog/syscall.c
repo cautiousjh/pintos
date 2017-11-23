@@ -359,7 +359,8 @@ syscall_mmap (int fd, void *addr)
 }
 
 void 
-syscall_munmap (mapid_t)
+syscall_munmap (mapid_t mmapid)
 {
+	return;
 
 }
