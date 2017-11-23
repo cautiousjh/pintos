@@ -14,7 +14,7 @@ enum page_status
 	ALL_ZERO,
 	IN_FILESYS,
 	IN_FRAME_TABLE,
-	IN_SWAP_TABLE,
+	IN_SWAP_DISK,
 };
 
 struct page
