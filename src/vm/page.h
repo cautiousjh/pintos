@@ -28,7 +28,6 @@ struct page
 	struct file* file_ptr;
 	off_t offset;
 	uint32_t read_bytes;
-	uint32_t zero_bytes;
 	bool writable;
 
 	enum page_status status;
