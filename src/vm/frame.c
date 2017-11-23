@@ -46,7 +46,7 @@ frame_evict(struct frame* f)
 	hash_first(&iter, &frames);
 	while(hash_next(&iter)){
 		temp_frame = hash_entry(hash_cur(&iter), struct frame, elem);
-		if(temp_frame->kaddr){
+		if(temp_frame->kpage){
 			if(pagedir_is_accessed(temp_frame->t->pagedir, temp_frame->related_page->addr))
 				pagedir_set_accessed(temp_frame->t->pagedir, temp_frame->related_page->addr, false);
 			else
