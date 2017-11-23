@@ -41,7 +41,26 @@ free_frame (struct frame* f)
 void* 
 frame_evict(struct frame* f)
 {
+	struct frame* temp_frame;
+	struct hash_iterator iter;
+	hash_first(&iter, &frames);
+	while(hash_next(&iter)){
+		temp_frame = hash_entry(hash_cur(&iter), struct frame, elem);
+		if(temp_frame->kaddr){
+			if(pagedir_is_accessed(temp_frame->t->pagedir, temp_frame->related_page->addr))
+				pagedir_set_accessed(temp_frame->t->pagedir, temp_frame->related_page->addr, false);
+			else
+				return frame_swap(f, temp_frame);
+		}
+
+	}
+}
+
+void*
+frame_swap(struct frame* new_frame, struct frame* victim)
+{
 	return NULL;
+
 }
 
 unsigned

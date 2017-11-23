@@ -22,6 +22,7 @@ struct frame{
 void frames_init(void);
 void* frame_alloc(struct frame* f);
 void* frame_evict(struct frame* f);
+void* frame_swap(struct frame* new_frame, struct frame* victim);
 void free_frame (struct frame* f);
 
 unsigned frame_hash_func(const struct hash_elem *e,void *aux);
