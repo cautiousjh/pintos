@@ -21,14 +21,14 @@ swap_init(void)
 void
 swap_in(struct page* p)
 {
-	void* tmp_addr = p->frame_entry->kpage;
+	uint32_t tmp_addr = p->frame_entry->kpage;
 	int sector, i;
 
 	lock_acquire(&block_lock);
 	p->sector = bitmap_scan_and_flip(blocks, 0, 1, false);
 	for(i=0;i<8;i++){
-		block_write(swap_table, i+sector*8, tmp_addr);
-		tmp_addr = (uint32_t)tmp_addr + BLOCK_SECTOR_SIZE;
+		block_write(swap_table, i+sector*8, (void*)tmp_addr);
+		tmp_addr = tmp_addr + BLOCK_SECTOR_SIZE;
 	}
 	lock_release(&block_lock);
 
@@ -38,13 +38,13 @@ swap_in(struct page* p)
 void 
 swap_out(struct page* p)
 {	
-	void* tmp_addr = p->frame_entry->kpage;
+	uint32_t tmp_addr = p->frame_entry->kpage;
 	int sector = p->sector, i;
 
 	lock_acquire(&block_lock);
 	for(i=0;i<8;i++){
-		block_read(swap_table, i+sector*8, tmp_addr);
-		tmp_addr = (uint32_t)tmp_addr + BLOCK_SECTOR_SIZE;
+		block_read(swap_table, i+sector*8, (void*)tmp_addr);
+		tmp_addr = tmp_addr + BLOCK_SECTOR_SIZE;
 	}
 	bitmap_reset(blocks,sector);
 	lock_release(&block_lock);
