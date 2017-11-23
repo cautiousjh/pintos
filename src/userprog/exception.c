@@ -219,6 +219,7 @@ page_fault (struct intr_frame *f)
 static bool
 stack_growth(void* fault_addr)
 {
+  struct thread* curr_thread = thread_current();
   if(fault_addr>PHYS_BASE)
     return false;
 
