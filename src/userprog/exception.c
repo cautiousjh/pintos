@@ -233,7 +233,7 @@ stack_growth(void* fault_addr)
   new_frame->related_page = new_page;
 
   // setting
-  new_page->addr = fault_addr << PGBITS;
+  new_page->addr = (void*)((uintptr_t)fault_addr << PGBITS);
   new_page->frame_entry = new_frame;
   new_page->writable = true;
   new_page->status = IN_FRAME_TABLE;
