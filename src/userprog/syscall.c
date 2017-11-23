@@ -395,11 +395,11 @@ syscall_munmap (mapid_t mmapid)
 					file_write_at(felem->this_file, unmap_page->addr, bytes, ofs);
 			else if(unmap_page->status == IN_SWAP_DISK){
 				return;
+			}
 			// free
 			free_frame(unmap_page->frame_entry);
 			free(unmap_page->frame_entry);
 			pagedir_clear_page(curr_thread->pagedir, unmap_page->addr);
-			}
 		}
 	}
 
