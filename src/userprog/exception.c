@@ -15,7 +15,7 @@
 static long long page_fault_cnt;
 
 static void kill (struct intr_frame *);
-void page_fault (struct intr_frame *);
+static void page_fault (struct intr_frame *);
 
 /* Registers handlers for interrupts that can be caused by user
    programs.
@@ -125,7 +125,7 @@ kill (struct intr_frame *f)
    can find more information about both of these in the
    description of "Interrupt 14--Page Fault Exception (#PF)" in
    [IA32-v3a] section 5.15 "Exception and Interrupt Reference". */
-void
+static void
 page_fault (struct intr_frame *f) 
 {
   bool not_present;  /* True: not-present page, false: writing r/o page. */
@@ -159,7 +159,8 @@ page_fault (struct intr_frame *f)
     new_frame->related_page = fault_page;
 
     // load the page
-    if(file_read(fault_page->file_ptr, new_frame->kpage, fault_page->read_bytes) !=
+    if(file_read_at(fault_page->file_ptr, new_frame->kpage,
+                    fault_page->read_bytes, fault_page->offset) !=
         (int) fault_page->read_bytes)
     {
       free_frame(new_frame);
