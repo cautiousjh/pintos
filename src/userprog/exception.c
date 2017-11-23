@@ -232,6 +232,9 @@ stack_growth(void* fault_addr)
   frame_alloc(new_frame);
   new_frame->related_page = new_page;
 
+  curr_thread->esp -= PGSIZE;
+  curr_thread->stack_page_cnt++;
+
   // setting
   if(is_kernel_vaddr(new_page->addr))
     new_page->addr = curr_thread->esp;
@@ -243,9 +246,6 @@ stack_growth(void* fault_addr)
   new_page->status = IN_FRAME_TABLE;
   new_page->in_stack_page = true;
   add_page(curr_thread, new_page);
-
-  curr_thread->esp -= PGSIZE;
-  curr_thread->stack_page_cnt++;
 
   // install
   if(install_page(new_page->addr, new_frame->kpage, true))
