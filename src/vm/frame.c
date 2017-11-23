@@ -16,7 +16,7 @@ void*
 frame_alloc(struct frame* new_frame)
 {
 	lock_acquire(&frame_lock);
-	new_frame->kpage = palloc_get_page(PAL_USER | PAL_ZERO);
+	new_frame->kpage = palloc_get_page(PAL_USER);
 	new_frame->t = thread_current();
 	lock_release(&frame_lock);
 
