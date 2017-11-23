@@ -363,17 +363,17 @@ syscall_munmap (mapid_t mmapid)
 	struct file_elem* felem = NULL;
 	struct list_elem* iter;
 	struct page* unmap_page;
-	size_t ofs;
+	size_t ofs, file_size;
 	struct thread* curr_thread = thread_current();
 
 	// mmapid validation
-	if(mmpid > curr_thrad->mmpid_cnt)
+	if(mmapid > curr_thrad->mmapid_cnt)
 		return;
 
 	lock_acquire(&file_lock);
 
 	// find file_elem
-	for(iter = list_begin(fd_list);
+	for(iter = list_begin(curr_thread->fd_list);
 		iter!= list_end(fd_list);
 		iter = iter->next){
 		felem = list_entry(iter, struct file_elem, elem);
@@ -383,18 +383,19 @@ syscall_munmap (mapid_t mmapid)
 
 	// iterate each page
 	if(iter != list_end(fd_list)){
+		file_size = file_length(felem->this_file);
 		for(ofs=0; ofs<file_size; ofs+=PGSIZE){
 			size_t bytes = ofs+PGSIZE < file_size? PGSIZE : file_size-ofs;
-			unmap_page = page_table_lookup(addr+ofs);
+			unmap_page = page_table_lookup(felem->addr+ofs);
 			if(unmap_page == NULL)
 				continue;
 
 			if(unmap_page->status == IN_FRAME_TABLE){
-				if(pagedir_is_dirty(pagedir,unmap_page->addr))
+				if(pagedir_is_dirty(curr_thread->pagedir,unmap_page->addr))
 					file_write_at(felem->this_file, unmap_page->addr, bytes, ofs);
 				free_frame(unmap_page->frame_entry);
 				free(unmap_page->frame_entry);
-				pagedir_clear_age(pagedir, unmap_page->addr);
+				pagedir_clear_page(curr_thread->pagedir, unmap_page->addr);
 			}
 			else if(unmap_page->status == IN_SWAP_DISK){
 				return;
