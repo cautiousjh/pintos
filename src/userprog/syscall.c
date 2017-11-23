@@ -217,7 +217,8 @@ syscall_close(int fd)
 	ASSERT_EXIT(get_file_elem(fd)->this_file);
 	if(fd == STDOUT_FILENO || fd == STDIN_FILENO)
 		return;
-	syscall_munmap(get_file_elem(fd)->mmapid);
+	if(!get_file_elem(fd)->addr)
+		syscall_munmap(get_file_elem(fd)->mmapid);
 	ASSERT_EXIT(close_file(fd));
 }
 
@@ -398,6 +399,7 @@ syscall_munmap (mapid_t mmapid)
 				return;
 			}
 			// free
+			felem->addr = NULL;
 			free_frame(unmap_page->frame_entry);
 			free(unmap_page->frame_entry);
 			pagedir_clear_page(curr_thread->pagedir, unmap_page->addr);
