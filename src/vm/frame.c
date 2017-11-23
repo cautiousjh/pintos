@@ -18,6 +18,7 @@ frame_alloc(struct frame* new_frame)
 	lock_acquire(&frame_lock);
 	new_frame->kpage = palloc_get_page(PAL_USER);
 	new_frame->t = thread_current();
+    pagedir_set_dirty(new_frame->t->pagedir, new_frame->kpage, true);
 	lock_release(&frame_lock);
 
 	if(new_frame->kpage){
