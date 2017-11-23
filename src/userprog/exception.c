@@ -248,7 +248,7 @@ stack_growth(void* fault_addr)
   add_page(curr_thread, new_page);
 
   // install
-  if(install_page(new_page->addr, new_frame->kpage, true))
+  if(!install_page(new_page->addr, new_frame->kpage, true))
     return false;
 
   return true;

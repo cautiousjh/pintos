@@ -546,7 +546,7 @@ setup_stack (void **esp, char *file_name, char **save_ptr)
   new_page->in_stack_page = true;
   add_page(curr_thread, new_page);
 
-  curr_thread->esp = PHYS_BASE-PGSIZE;
+  curr_thread->esp = (uint8_t *)PHYS_BASE-PGSIZE;
   curr_thread->stack_page_cnt++;
 
   if (kpage != NULL) 
