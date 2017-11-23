@@ -304,7 +304,7 @@ syscall_mmap (int fd, void *addr)
 	size_t ofs;
 
 	// fd, addr0, addr aligned validation
-	if(fd<=1 || addr == NULL || !pg_ofs(addr))
+	if(fd<=1 || addr == NULL || addr%PGSIZE)
 		return -1;
 
 	lock_acquire(&file_lock);
@@ -334,7 +334,6 @@ syscall_mmap (int fd, void *addr)
 	// page mapping
 	for(ofs = 0; ofs < file_size; ofs+=PGSIZE){
 		size_t read_bytes = ofs+PGSIZE < file_size? PGSIZE : file_size-ofs;
-		size_t zero_bytes = PGSIZE - read_bytes;
 
 		struct page* new_page = (struct page*)malloc(sizeof(struct page));
 		new_page->addr = addr + ofs;
@@ -361,6 +360,8 @@ syscall_mmap (int fd, void *addr)
 void 
 syscall_munmap (mapid_t mmapid)
 {
-	return;
+	lock_acquire(&file_lock);
+
+	lock_release(&file_lock);
 
 }
