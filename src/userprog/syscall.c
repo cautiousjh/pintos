@@ -348,6 +348,7 @@ syscall_mmap (int fd, void *addr)
 		new_page->file_ptr = felem->this_file;
 		new_page->offset = ofs;
 		new_page->read_bytes = read_bytes;
+		new_page->sector = -1;
 		add_page(curr_thread, new_page);
 	}
 
@@ -397,7 +398,7 @@ syscall_munmap (mapid_t mmapid)
 			if(unmap_page->status == IN_FRAME_TABLE)
 				if(pagedir_is_dirty(curr_thread->pagedir,unmap_page->addr))
 					file_write_at(felem->this_file, unmap_page->addr, bytes, ofs);
-			else if(unmap_page->status == IN_SWAP_DISK){
+			else if(unmap_page->status == IN_SWAP_TABLE){
 				return;
 			}
 			// free

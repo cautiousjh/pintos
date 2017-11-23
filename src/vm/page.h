@@ -14,7 +14,7 @@ enum page_status
 	ALL_ZERO,
 	IN_FILESYS,
 	IN_FRAME_TABLE,
-	IN_SWAP_DISK,
+	IN_SWAP_TABLE,
 };
 
 struct page
@@ -32,6 +32,9 @@ struct page
 
 	enum page_status status;
 	bool in_stack_page;
+
+	// swap table
+	int sector;
 
 	struct hash_elem elem;
 };

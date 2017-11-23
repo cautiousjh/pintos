@@ -506,6 +506,7 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
       new_page->writable = writable;
       new_page->status = IN_FILESYS;
       new_page->in_stack_page = false;
+      new_page->sector = -1;
       add_page(curr_thread, new_page);
 
       /* Advance. */
@@ -546,6 +547,7 @@ setup_stack (void **esp, char *file_name, char **save_ptr)
   new_page->writable = true;
   new_page->status = IN_FRAME_TABLE;
   new_page->in_stack_page = true;
+  new_page->sector = -1;
   add_page(curr_thread, new_page);
 
   curr_thread->esp = (uint8_t *)PHYS_BASE-PGSIZE;

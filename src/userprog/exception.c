@@ -205,7 +205,7 @@ page_fault (struct intr_frame *f)
     if(success)
       return;
   }
-  else if(fault_page->status == IN_SWAP_DISK){
+  else if(fault_page->status == IN_SWAP_TABLE){
     return;
   }
 
