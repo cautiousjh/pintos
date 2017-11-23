@@ -124,6 +124,7 @@ struct thread
 #ifdef VM
     struct hash page_table;
     int stack_page_cnt;
+    void* esp;
 #endif
 
     /* Owned by thread.c. */

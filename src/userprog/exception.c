@@ -224,7 +224,7 @@ stack_growth(void* fault_addr)
     return false;
 
   // check max growth
-  if(curr_thread->stack_page_cnt++ > STACK_PAGE_MAX_NUM)
+  if(curr_thread->stack_page_cnt > STACK_PAGE_MAX_NUM)
     return false;
 
   struct page*  new_page  = (struct page*)malloc(sizeof(struct page));
@@ -233,12 +233,19 @@ stack_growth(void* fault_addr)
   new_frame->related_page = new_page;
 
   // setting
-  new_page->addr = (void*)((uintptr_t)fault_addr << PGBITS);
+  if(is_kernel_vaddr(new_page->addr))
+    new_page->addr = curr_thread->esp;
+  else
+    new_page->addr = (void*)((uintptr_t)fault_addr << PGBITS);
+
   new_page->frame_entry = new_frame;
   new_page->writable = true;
   new_page->status = IN_FRAME_TABLE;
   new_page->in_stack_page = true;
   add_page(curr_thread, new_page);
+
+  curr_thread->esp -= PGSIZE;
+  curr_thread->stack_page_cnt++;
 
   // install
   if(install_page(new_page->addr, new_frame->kpage, true))
