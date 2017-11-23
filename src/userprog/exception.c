@@ -166,6 +166,8 @@ page_fault (struct intr_frame *f)
 
     if(!stack_growth(fault_addr))
       syscall_exit(-1);
+
+    return;
   }
 
   if (fault_page->status == IN_FILESYS){
