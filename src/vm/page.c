@@ -30,7 +30,7 @@ page_table_lookup(void* address)
 	struct page target;
 	struct hash_elem *e;
 
-	target.addr = (void*)((uintptr_t)address>>PGBITS)<<PGBITS; //page start addr
+	target.addr = (void*)(((uintptr_t)address>>PGBITS)<<PGBITS); //page start addr
 	e= hash_find(&curr_thread->page_table, &target.elem);
 	return e==NULL ? NULL : hash_entry(e, struct page, elem);
 }
