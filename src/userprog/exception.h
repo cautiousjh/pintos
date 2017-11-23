@@ -9,4 +9,5 @@
 void exception_init (void);
 void exception_print_stats (void);
 
+bool stack_growth(void* fault_page);
 #endif /* userprog/exception.h */
