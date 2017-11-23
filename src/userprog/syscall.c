@@ -304,7 +304,7 @@ syscall_mmap (int fd, void *addr)
 	size_t ofs;
 
 	// fd, addr0, addr aligned validation
-	if(fd<=1 || addr == NULL || addr%PGSIZE)
+	if(fd<=1 || addr == NULL || (uint32_t)addr%PGSIZE)
 		return -1;
 
 	lock_acquire(&file_lock);
