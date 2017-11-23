@@ -541,9 +541,12 @@ setup_stack (void **esp, char *file_name, char **save_ptr)
 
   new_page->addr = PHYS_BASE - PGSIZE;
   new_page->frame_entry = new_frame;
+  new_page->writable = true;
   new_page->status = IN_FRAME_TABLE;
   new_page->in_stack_page = true;
   add_page(curr_thread, new_page);
+
+  curr_thread->stack_page_cnt++;
 
   if (kpage != NULL) 
     {

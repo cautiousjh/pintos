@@ -1,6 +1,8 @@
 #ifndef VM_PAGE_H
 #define VM_PAGE_H
 
+#define STACK_PAGE_MAX_NUM 2048
+
 #include <hash.h>
 #include "vm/frame.h"
 #include "threads/malloc.h"

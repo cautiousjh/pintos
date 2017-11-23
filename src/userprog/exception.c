@@ -16,6 +16,7 @@ static long long page_fault_cnt;
 
 static void kill (struct intr_frame *);
 static void page_fault (struct intr_frame *);
+static bool stack_growth(struct page* fault_page);
 
 /* Registers handlers for interrupts that can be caused by user
    programs.
@@ -152,12 +153,14 @@ page_fault (struct intr_frame *f)
   // check whether fault_page is valid or not
   if (fault_addr == NULL || is_kernel_vaddr(fault_addr))
     syscall_exit(-1);
-  // stack range check
-  if(fault_addr > PHYS_BASE) /* || under the stack? */
-    syscall_exit(-1);
 
   // newly added parts for VM
   struct page *fault_page = page_table_lookup(fault_addr);
+
+  // no page -> stack growth
+  if(fault_page == NULL)
+    if(!stack_growth(fault_page))
+      syscall_exit(-1);
 
   if (fault_page->status == IN_FILESYS){
     bool success = true;
@@ -212,3 +215,33 @@ page_fault (struct intr_frame *f)
   kill (f);
 }
 
+
+static bool
+stack_growth(struct page* fault_page)
+{
+  if(fault_addr>PHYS_BASE)
+    return false;
+
+  // check max growth
+  if(curr_thread->stack_page_cnt++ > STACK_PAGE_MAX_NUM)
+    return false;
+
+  struct page*  new_page  = (struct page*)malloc(sizeof(struct page));
+  struct frame* new_frame = (struct frame*)malloc(sizeof(struct frame));
+  frame_alloc(new_frame);
+  new_frame->related_page = new_page;
+
+  // setting
+  new_page->addr = fault_addr << PGBITS;
+  new_page->frame_entry = new_frame;
+  new_page->writable = true;
+  new_page->status = IN_FRAME_TABLE;
+  new_page->in_stack_page = true;
+  add_page(curr_thread, new_page);
+
+  // install
+  if(install_page(curr_thread->pagedir, new_page->addr, true))
+    return false;
+
+  return true;
+}
