@@ -158,9 +158,15 @@ page_fault (struct intr_frame *f)
   struct page *fault_page = page_table_lookup(fault_addr);
 
   // no page -> stack growth
-  if(fault_page == NULL)
+  if(fault_page == NULL){
+    //validity
+    if(is_kernel_vaddr(fault_addr) || 
+       fault_addr < (f->esp)-32 || fault_addr > (f->esp)+32)
+      syscall_exit(-1);
+
     if(!stack_growth(fault_addr))
       syscall_exit(-1);
+  }
 
   if (fault_page->status == IN_FILESYS){
     bool success = true;
@@ -220,8 +226,6 @@ bool
 stack_growth(void* fault_addr)
 {
   struct thread* curr_thread = thread_current();
-  if(fault_addr>PHYS_BASE)
-    return false;
 
   // check max growth
   if(curr_thread->stack_page_cnt > STACK_PAGE_MAX_NUM)
@@ -236,10 +240,7 @@ stack_growth(void* fault_addr)
   curr_thread->stack_page_cnt++;
 
   // setting
-  if(is_kernel_vaddr(new_page->addr))
-    new_page->addr = curr_thread->esp;
-  else
-    new_page->addr = (void*)((uintptr_t)fault_addr << PGBITS);
+  new_page->addr = (void*)((uintptr_t)fault_addr << PGBITS);
 
   new_page->frame_entry = new_frame;
   new_page->writable = true;
