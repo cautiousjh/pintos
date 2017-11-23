@@ -155,6 +155,7 @@ page_fault (struct intr_frame *f)
   if (fault_page->status == IN_FILESYS){
     bool success = true;
     struct frame* new_frame;
+    new_frame = (struct frame*)malloc(sizeof(struct frame));
     frame_alloc(new_frame);
     new_frame->related_page = fault_page;
 

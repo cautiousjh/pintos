@@ -532,6 +532,7 @@ setup_stack (void **esp, char *file_name, char **save_ptr)
 
   //frame allocation
   struct frame* new_frame;
+  new_frame = (struct frame*)malloc(sizeof(struct frame));
   kpage = frame_alloc(new_frame);
 
   //page setting
