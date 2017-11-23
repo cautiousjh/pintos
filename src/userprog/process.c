@@ -523,7 +523,7 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
 bool
 setup_stack (void **esp, char *file_name, char **save_ptr) 
 {
-  uint8_t *kpage;
+  uint8_t *kpage = NULL;
   bool success = false;
   char *token;
   char **argv_addr;
@@ -534,7 +534,7 @@ setup_stack (void **esp, char *file_name, char **save_ptr)
   //frame allocation
   struct frame* new_frame;
   new_frame = (struct frame*)malloc(sizeof(struct frame));
-  kpage = frame_alloc(new_frame);
+  while(!kpage) {kpage = frame_alloc(new_frame)};
   pagedir_set_accessed(curr_thread->pagedir, kpage, true);
   pagedir_set_dirty(curr_thread->pagedir, kpage, false);
 

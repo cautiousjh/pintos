@@ -7,6 +7,7 @@
 #include "threads/malloc.h"
 #include "devices/block.h"
 #include "filesys/off_t.h"
+#include "vm/swap.h"
 
 struct hash frames;
 

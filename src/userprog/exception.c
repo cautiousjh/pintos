@@ -175,7 +175,7 @@ page_fault (struct intr_frame *f)
     bool success = true;
     struct frame* new_frame;
     new_frame = (struct frame*)malloc(sizeof(struct frame));
-    frame_alloc(new_frame);
+    while(!frame_alloc(new_frame));
     pagedir_set_accessed(new_frame->t->pagedir, new_frame->kpage, true);
     pagedir_set_dirty(new_frame->t->pagedir, new_frame->kpage, false);
     new_frame->related_page = fault_page;
@@ -195,10 +195,7 @@ page_fault (struct intr_frame *f)
 
     // install page into frame
     if(!install_page(fault_page->addr, new_frame->kpage, fault_page->writable))
-    {
-      free_frame(new_frame);
       success = false;
-    }
 
     fault_page->status = IN_FRAME_TABLE;
     fault_page->frame_entry = new_frame;
@@ -206,8 +203,19 @@ page_fault (struct intr_frame *f)
       return;
   }
   else if(fault_page->status == IN_SWAP_TABLE){
-    return;
+    struct frame* new_frame = (struct frame*)malloc(sizeof(struct frame));
+    while(!frame_alloc(new_frame));
+    new_frame->related_page = fault_page;
+    fault_page->frame_entry = new_frame;
+    fault_page->status = IN_FRAME_TABLE;
+
+    //load the page
+    swap_in(fault_page);
+
+    if(!install_page(fault_page->addr, new_frame->kpage, fault_page->writable))
+      return;    
   }
+}
 
 
   /* Determine cause. */
@@ -243,7 +251,7 @@ stack_growth(void* fault_addr)
 
   struct page*  new_page  = (struct page*)malloc(sizeof(struct page));
   struct frame* new_frame = (struct frame*)malloc(sizeof(struct frame));
-  frame_alloc(new_frame);
+  while(!frame_alloc(new_frame));
   new_frame->related_page = new_page;
 
   curr_thread->stack_page_cnt++;

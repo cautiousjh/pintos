@@ -3,6 +3,7 @@
 #include "devices/block.h"
 #include "threads/malloc.h"
 #include "threads/synch.h"
+#include "threads/vaddr.h"
 
 static struct bitmap* blocks;
 static struct lock block_lock;
@@ -26,8 +27,8 @@ swap_in(struct page* p)
 
 	lock_acquire(&block_lock);
 	p->sector = bitmap_scan_and_flip(blocks, 0, 1, false);
-	for(i=0;i<8;i++){
-		block_write(swap_table, i+sector*8, (void*)tmp_addr);
+	for(i=0;i<PGSIZE/BLOCK_SECTOR_SIZE;i++){
+		block_write(swap_table, i+sector*PGSIZE/BLOCK_SECTOR_SIZE, (void*)tmp_addr);
 		tmp_addr = tmp_addr + BLOCK_SECTOR_SIZE;
 	}
 	lock_release(&block_lock);
@@ -42,8 +43,8 @@ swap_out(struct page* p)
 	int sector = p->sector, i;
 
 	lock_acquire(&block_lock);
-	for(i=0;i<8;i++){
-		block_read(swap_table, i+sector*8, (void*)tmp_addr);
+	for(i=0;i<PGSIZE/BLOCK_SECTOR_SIZE;i++){
+		block_read(swap_table, i+sector*PGSIZE/BLOCK_SECTOR_SIZE, (void*)tmp_addr);
 		tmp_addr = tmp_addr + BLOCK_SECTOR_SIZE;
 	}
 	bitmap_reset(blocks,sector);
