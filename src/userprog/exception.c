@@ -167,6 +167,7 @@ page_fault (struct intr_frame *f)
       free_frame(new_frame);
       success = false;
     }
+    // fill rest with 0
     memset (new_frame->kpage + fault_page->read_bytes, 0, PGSIZE - fault_page->read_bytes);
 
     // install page into frame
