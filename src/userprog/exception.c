@@ -189,8 +189,8 @@ page_fault (struct intr_frame *f)
       success = false;
     }
     // fill rest with 0
-    //if(fault_page->zero_bytes)
-    //  memset(new_frame->kpage+fault_page->read_bytes+1, 0, fault_page->zero_bytes);
+    //if(PGSIZE - fault_page->read_bytes != 0)
+    //  memset (new_frame->kpage + fault_page->read_bytes, 0, PGSIZE - fault_page->read_bytes);
 
     // install page into frame
     if(!install_page(fault_page->addr, new_frame->kpage, fault_page->writable))
