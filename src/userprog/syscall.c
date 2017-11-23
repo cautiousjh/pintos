@@ -390,15 +390,15 @@ syscall_munmap (mapid_t mmapid)
 			if(unmap_page == NULL)
 				continue;
 
-			if(unmap_page->status == IN_FRAME_TABLE){
+			if(unmap_page->status == IN_FRAME_TABLE)
 				if(pagedir_is_dirty(curr_thread->pagedir,unmap_page->addr))
 					file_write_at(felem->this_file, unmap_page->addr, bytes, ofs);
-				free_frame(unmap_page->frame_entry);
-				free(unmap_page->frame_entry);
-				pagedir_clear_page(curr_thread->pagedir, unmap_page->addr);
-			}
 			else if(unmap_page->status == IN_SWAP_DISK){
 				return;
+			// free
+			free_frame(unmap_page->frame_entry);
+			free(unmap_page->frame_entry);
+			pagedir_clear_page(curr_thread->pagedir, unmap_page->addr);
 			}
 		}
 	}
