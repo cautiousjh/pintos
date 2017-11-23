@@ -16,7 +16,7 @@ static long long page_fault_cnt;
 
 static void kill (struct intr_frame *);
 static void page_fault (struct intr_frame *);
-static bool stack_growth(struct page* fault_page);
+static bool stack_growth(void* fault_page);
 
 /* Registers handlers for interrupts that can be caused by user
    programs.
@@ -217,7 +217,7 @@ page_fault (struct intr_frame *f)
 
 
 static bool
-stack_growth(struct page* fault_page)
+stack_growth(void* fault_addr)
 {
   if(fault_addr>PHYS_BASE)
     return false;
