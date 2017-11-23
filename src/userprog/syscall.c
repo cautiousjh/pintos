@@ -217,8 +217,8 @@ syscall_close(int fd)
 	ASSERT_EXIT(get_file_elem(fd)->this_file);
 	if(fd == STDOUT_FILENO || fd == STDIN_FILENO)
 		return;
-	ASSERT_EXIT(close_file(fd));
 	syscall_munmap(get_file_elem(fd)->mmapid);
+	ASSERT_EXIT(close_file(fd));
 }
 
 
