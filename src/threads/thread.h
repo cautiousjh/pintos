@@ -125,6 +125,7 @@ struct thread
     struct hash page_table;
     int stack_page_cnt;
     void* esp;
+    int mmapid_cnt;
 #endif
 
     /* Owned by thread.c. */

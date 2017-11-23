@@ -10,6 +10,8 @@
 #include "filesys/file.h"
 #include "filesys/filesys.h"
 #include "devices/shutdown.h"
+#include "vm/frame.h"
+#include "vm/page.h"
 
 #define ASSERT_EXIT( COND ) { if(!(COND)) syscall_exit(-1); }
 
@@ -77,6 +79,12 @@ syscall_handler (struct intr_frame *f UNUSED)
     case SYS_CLOSE:
     	syscall_close(*((char**)(f->esp)+1)); 
      	break;
+    case SYS_MMAP:
+    	f->eax = syscall_mmap(*((int*)(f->esp)+1),*((void *)(f->esp)+2));
+    	break;
+    case SYS_MUNMAP:
+    	syscall_munmap(*((mapid_t*)(f->esp)+1));
+    	break;
     default: break;
   }
 }
@@ -148,6 +156,8 @@ syscall_open(const char* name)
 	felem = malloc(sizeof(struct file_elem));
 	felem->fd = set_new_fd();
 	felem->this_file = open_file;
+	felem->mmapid = -1;
+	felem->addr = NULL;
 	list_push_back(&thread_current()->fd_list, &felem->elem);
 
 	return felem->fd;
@@ -283,4 +293,74 @@ set_new_fd(void){
 	lock_release(&file_lock);
 
 	return new_fd;
+}
+
+
+mapid_t 
+syscall_mmap (int fd, void *addr)
+{
+	struct file_elem* felem;
+	struct thread* curr_thread = thread_current();
+	size_t ofs;
+
+	filesys_lock
+	// fd, addr0, addr aligned validation
+	if(fd<=1 || addr == NULL || !pg_ofs(addr))
+		return -1;
+
+	lock_acquire(&file_lock);
+	
+	// file validation
+	felem = get_file_elem(fd);
+	if(felem->this_file == NULL){
+		lock_release(&file_lock);
+		return -1;
+	}
+
+	//file size validation
+	size_t file_size = file_length(felem->this_file);
+	if(file_size==0){
+		lock_release(&file_lock);
+		return -1;
+	}
+
+	// page duplicated validation
+	for(ofs = 0; ofs < file_size; ofs+=PGSIZE){
+		if(page_table_lookup(addr+ofs)){
+			lock_release(&file_lock);
+			return -1;
+		}
+	}
+
+	// page mapping
+	for(ofs = 0; ofs < file_size; ofs+=PGSIZE){
+		size_t read_bytes = ofs+PGSIZE < file_size? PGSIZE : file_size-ofs;
+		size_t zero_bytes = PG_SIZE - read_bytes;
+
+		struct page* new_page = (struct page*)malloc(sizeof(struct page));
+		new_page->addr = addr + ofs;
+		new_page->frame_entry = NULL;
+		new_page->writable = true; 
+		new_page->status = IN_FILESYS;
+		new_page->in_stack_page = false;
+		new_page->file_ptr = felem->this_file;
+		new_page->offset = ofs;
+		new_page->read_bytes = read_bytes;
+		add_page(curr_thread, new_page);
+	}
+
+	// mmapid mapping
+	curr_thread->mmapid_cnt++;
+	felem->mmapid = curr_thread->mmapid_cnt;
+	felem->addr = addr;
+
+	lock_release(&file_lock);
+
+	return felem->mmapid;
+}
+
+void 
+syscall_munmap (mapid_t)
+{
+
 }

@@ -7,6 +7,8 @@
 struct file_elem
 {
 	int fd;
+	int mmapid;
+	void* addr;
 	struct file* this_file;
 	struct list_elem elem;
 };

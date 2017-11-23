@@ -24,8 +24,11 @@ frame_alloc(struct frame* new_frame)
       	hash_insert(&frames,&new_frame->elem);
 		return new_frame->kpage;
 	}
-	else
+	else{
+		lock_acquire(&frame_lock);
 		return frame_evict(new_frame);
+		lock_release(&frame_lock);
+	}
 
 }
 

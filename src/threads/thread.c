@@ -232,6 +232,7 @@ thread_create (const char *name, int priority,
   t->isWaiting = false;
 #endif
   t->stack_page_cnt = 0;
+  t->mmapid_cnt = 0;
 
   intr_set_level (old_level);
 

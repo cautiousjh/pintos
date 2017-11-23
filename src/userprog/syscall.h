@@ -20,6 +20,8 @@ void syscall_seek(int fd, unsigned position);
 unsigned syscall_tell(int fd);
 void syscall_close(int fd);
 
+mapid_t syscall_mmap (int fd, void *addr);
+void syscall_munmap (mapid_t);
 
 struct file_elem* get_file_elem(int fd);
 bool close_file(int fd);
