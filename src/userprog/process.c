@@ -503,7 +503,6 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
       new_page->file_ptr = file;
       new_page->offset = ofs;
       new_page->read_bytes = page_read_bytes;
-      new_page->zero_bytes = page_zero_bytes;
       new_page->writable = writable;
       new_page->status = IN_FILESYS;
       new_page->in_stack_page = false;
