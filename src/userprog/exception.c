@@ -16,7 +16,7 @@ static long long page_fault_cnt;
 
 static void kill (struct intr_frame *);
 static void page_fault (struct intr_frame *);
-bool stack_growth (void* fault_page);
+bool stack_growth (void* fault_addr);
 
 /* Registers handlers for interrupts that can be caused by user
    programs.
@@ -159,7 +159,7 @@ page_fault (struct intr_frame *f)
 
   // no page -> stack growth
   if(fault_page == NULL)
-    if(!stack_growth(fault_page))
+    if(!stack_growth(fault_addr))
       syscall_exit(-1);
 
   if (fault_page->status == IN_FILESYS){
@@ -217,10 +217,10 @@ page_fault (struct intr_frame *f)
 
 
 bool
-stack_growth(void* fault_page)
+stack_growth(void* fault_addr)
 {
   struct thread* curr_thread = thread_current();
-  if(fault_page>PHYS_BASE)
+  if(fault_addr>PHYS_BASE)
     return false;
 
   // check max growth
@@ -233,7 +233,7 @@ stack_growth(void* fault_page)
   new_frame->related_page = new_page;
 
   // setting
-  new_page->addr = (void*)((uintptr_t)fault_page << PGBITS);
+  new_page->addr = (void*)((uintptr_t)fault_addr << PGBITS);
   new_page->frame_entry = new_frame;
   new_page->writable = true;
   new_page->status = IN_FRAME_TABLE;
