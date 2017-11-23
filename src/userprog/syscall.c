@@ -136,6 +136,7 @@ bool
 syscall_remove(const char* name)
 {
 	ASSERT_EXIT(name);
+
 	return filesys_remove(name);
 }
 
