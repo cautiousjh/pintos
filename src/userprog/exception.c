@@ -216,10 +216,10 @@ page_fault (struct intr_frame *f)
 
 
 bool
-stack_growth(void* fault_addr)
+stack_growth(void* fault_page)
 {
   struct thread* curr_thread = thread_current();
-  if(fault_addr>PHYS_BASE)
+  if(fault_page>PHYS_BASE)
     return false;
 
   // check max growth
@@ -232,7 +232,7 @@ stack_growth(void* fault_addr)
   new_frame->related_page = new_page;
 
   // setting
-  new_page->addr = (void*)((uintptr_t)fault_addr << PGBITS);
+  new_page->addr = (void*)((uintptr_t)fault_page << PGBITS);
   new_page->frame_entry = new_frame;
   new_page->writable = true;
   new_page->status = IN_FRAME_TABLE;
