@@ -69,7 +69,7 @@ frame_evict(struct frame* f)
   	for(iter = list_begin(&frames);
       	iter != list_end(&frames);
       	iter = iter->next){
-		temp_frame = hash_entry(hash_cur(&iter), struct frame, elem);
+		temp_frame = list_entry(iter, struct frame, elem);
 		if(temp_frame->kpage){
 			if(!pagedir_is_dirty(temp_frame->t->pagedir, temp_frame->related_page->addr))
 				frame_swap(temp_frame); 		
@@ -78,7 +78,7 @@ frame_evict(struct frame* f)
   	for(iter = list_begin(&frames);
       	iter != list_end(&frames);
       	iter = iter->next){
-		temp_frame = hash_entry(hash_cur(&iter), struct frame, elem);
+		temp_frame = list_entry(iter, struct frame, elem);
 		if(temp_frame->kpage)
 			frame_swap(temp_frame); 		
   	}
