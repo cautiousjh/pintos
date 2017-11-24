@@ -20,22 +20,21 @@ frame_alloc(struct frame* new_frame)
 	new_frame->kpage = palloc_get_page(PAL_USER);
 	new_frame->t = thread_current();
     pagedir_set_accessed(new_frame->t->pagedir, new_frame->kpage, true);
-	lock_release(&frame_lock);
 
 	if(new_frame->kpage){
       	list_push_back(&frames,&new_frame->elem);
+		lock_release(&frame_lock);
 		return new_frame->kpage;
 	}
 	else{
-		lock_acquire(&frame_lock);
 		frame_evict(new_frame);
 
 		new_frame->kpage = palloc_get_page(PAL_USER);
 		new_frame->t = thread_current();
     	pagedir_set_accessed(new_frame->t->pagedir, new_frame->kpage, true);
-		lock_release(&frame_lock);
 
       	list_push_back(&frames,&new_frame->elem);
+		lock_release(&frame_lock);
 		return new_frame->kpage;
 	}
 }
