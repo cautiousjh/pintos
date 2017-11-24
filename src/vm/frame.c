@@ -43,6 +43,7 @@ void
 free_frame (struct frame* f)
 {
 	lock_acquire(&frame_lock);
+  	list_remove(&f->elem);
 	palloc_free_page(f->kpage);
 	lock_release(&frame_lock);
 }
@@ -81,6 +82,7 @@ frame_evict(struct frame* f)
 		if(temp_frame->kpage)
 			frame_swap(temp_frame); 		
   	}
+  	list_remove(&temp_frame->elem);
 	free(temp_frame);
 	return NULL;
 }
