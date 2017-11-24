@@ -45,7 +45,7 @@ free_frame (struct frame* f)
 	lock_acquire(&frame_lock);
   	list_remove(&f->elem);
 	palloc_free_page(f->kpage);
-	pagedir_clear_page(f->related_page->pagedir, f->related_page->addr);
+	pagedir_clear_page(f->t->pagedir, f->related_page->addr);
 	lock_release(&frame_lock);
 }
 
