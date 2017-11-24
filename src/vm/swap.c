@@ -29,6 +29,7 @@ swap_in(struct page* p)
 				   p->kpage + i*BLOCK_SECTOR_SIZE);
 	}
 	bitmap_reset(blocks,p->sector);
+	p->sector = -1;
 	lock_release(&block_lock);
 
 }
