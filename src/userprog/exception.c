@@ -215,9 +215,6 @@ page_fault (struct intr_frame *f)
     if(!install_page(fault_page->addr, new_frame->kpage, fault_page->writable))
       return;    
   }
-}
-
-
   /* Determine cause. */
   not_present = (f->error_code & PF_P) == 0;
   write = (f->error_code & PF_W) != 0;
