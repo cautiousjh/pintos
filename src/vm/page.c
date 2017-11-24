@@ -14,7 +14,7 @@ page_table_init(struct hash* page_table)
 void
 page_destructor(struct hash_elem* e, void* aux UNUSED)
 {
-	struct page* p = hash_entry(hash_cur(&e), struct page, elem);
+	struct page* p = hash_entry(e, struct page, elem);
 	if(p->frame_entry)
 		free_frame(p->frame_entry);
 	if(p->sector != -1)
