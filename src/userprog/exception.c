@@ -207,6 +207,7 @@ page_fault (struct intr_frame *f)
     pagedir_set_dirty(new_frame->t->pagedir, new_frame->kpage, false);
     new_frame->related_page = fault_page;
 
+    fault_page->kpage = new_frame->kpage;
     fault_page->status = IN_FRAME_TABLE;
     fault_page->frame_entry = new_frame;    
 

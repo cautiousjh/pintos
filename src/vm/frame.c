@@ -88,7 +88,6 @@ frame_evict(struct frame* f)
   	}
 	
 	frame_swap(temp_frame);  
-  	list_remove(&temp_frame->elem);
 	//free(temp_frame);
 	return;		
 	
