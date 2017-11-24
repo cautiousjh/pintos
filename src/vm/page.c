@@ -16,6 +16,7 @@ page_table_destroy(struct hash* page_table)
 {
 	struct hash_iterator iter;
 	struct page* page_temp;
+	hash_first(&iter,page_table);
 	while(hash_next(&iter)){
 		 page_temp = hash_entry(hash_cur(&iter), struct page, elem);
 		if(page_temp->frame_entry){
