@@ -93,9 +93,9 @@ frame_swap(struct frame* new_frame, struct frame* victim)
 {
 	// memory to swap_disk
 	swap_out(victim->related_page);
-	victim->related_page->frame = NULL;
+	victim->related_page->frame_entry = NULL;
 	victim->related_page->status = IN_SWAP_TABLE;
-	pagedir_clear_page(victim->related_page->pagedir, victim->related_page->addr);
+	pagedir_clear_page(victim->t->pagedir, victim->related_page->addr);
 	return NULL;
 
 }
