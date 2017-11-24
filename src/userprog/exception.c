@@ -153,8 +153,15 @@ page_fault (struct intr_frame *f)
   page_fault_cnt++;
 
   // check whether fault_page is valid or not
-  if (fault_addr == NULL || is_kernel_vaddr(fault_addr))
+  if (fault_addr == NULL)
     syscall_exit(-1);
+
+  // 0xcccccccc
+  if(!user) { // kernel mode
+    f->eip = (void *) f->eax;
+    f->eax = 0xffffffff;
+    return;
+  }
 
   // newly added parts for VM
   struct page *fault_page = page_table_lookup(fault_addr);
@@ -178,7 +185,6 @@ page_fault (struct intr_frame *f)
     pagedir_set_accessed(new_frame->t->pagedir, new_frame->kpage, true);
     pagedir_set_dirty(new_frame->t->pagedir, new_frame->kpage, false);
     new_frame->related_page = fault_page;
-    fault_page->status = IN_FRAME_TABLE;
 
     // load the page
     if(file_read_at(fault_page->file_ptr, new_frame->kpage,
