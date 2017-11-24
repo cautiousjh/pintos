@@ -28,10 +28,15 @@ frame_alloc(struct frame* new_frame)
 	else{
 		lock_acquire(&frame_lock);
 		frame_evict(new_frame);
-		lock_release(&frame_lock);
-		return NULL;
-	}
 
+		new_frame->kpage = palloc_get_page(PAL_USER);
+		new_frame->t = thread_current();
+    	pagedir_set_accessed(new_frame->t->pagedir, new_frame->kpage, true);
+		lock_release(&frame_lock);
+		
+      	hash_insert(&frames,&new_frame->elem);
+		return new_frame->kpage;
+	}
 }
 
 void
@@ -89,7 +94,6 @@ frame_swap(struct frame* victim)
 	palloc_free_page(victim->kpage);
 	pagedir_clear_page(victim->t->pagedir, victim->related_page->addr);
 	return NULL;
-
 }
 
 unsigned

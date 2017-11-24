@@ -175,7 +175,7 @@ page_fault (struct intr_frame *f)
     bool success = true;
     struct frame* new_frame;
     new_frame = (struct frame*)malloc(sizeof(struct frame));
-    while(!frame_alloc(new_frame));
+    frame_alloc(new_frame);
     pagedir_set_accessed(new_frame->t->pagedir, new_frame->kpage, true);
     pagedir_set_dirty(new_frame->t->pagedir, new_frame->kpage, false);
     new_frame->related_page = fault_page;
@@ -204,7 +204,7 @@ page_fault (struct intr_frame *f)
   }
   else if(fault_page->status == IN_SWAP_TABLE){
     struct frame* new_frame = (struct frame*)malloc(sizeof(struct frame));
-    while(!frame_alloc(new_frame));
+    frame_alloc(new_frame);
     new_frame->related_page = fault_page;
     fault_page->frame_entry = new_frame;
     fault_page->status = IN_FRAME_TABLE;
@@ -248,7 +248,7 @@ stack_growth(void* fault_addr)
 
   struct page*  new_page  = (struct page*)malloc(sizeof(struct page));
   struct frame* new_frame = (struct frame*)malloc(sizeof(struct frame));
-  while(!frame_alloc(new_frame));
+  frame_alloc(new_frame);
   new_frame->related_page = new_page;
 
   curr_thread->stack_page_cnt++;
