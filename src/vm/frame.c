@@ -49,8 +49,6 @@ frame_evict(struct frame* f)
 	struct frame* temp_frame;
 	struct hash_iterator iter;
 
-	lock_acquire(&frame_lock);
-
 	hash_first(&iter, &frames);
 	while(hash_next(&iter)){
 		temp_frame = hash_entry(hash_cur(&iter), struct frame, elem);
@@ -85,7 +83,6 @@ frame_evict(struct frame* f)
 	}
 
 	return NULL;
-	lock_release(&frame_lock);
 }
 
 void*
