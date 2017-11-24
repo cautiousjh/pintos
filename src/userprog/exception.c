@@ -135,6 +135,7 @@ page_fault (struct intr_frame *f)
   bool user;         /* True: access by user, false: access by kernel. */
   void *fault_addr;  /* Fault address. */
 
+  bool success = true;
   /* Obtain faulting address, the virtual address that was
      accessed to cause the fault.  It may point to code or to
      data.  It is not necessarily the address of the instruction
@@ -172,7 +173,6 @@ page_fault (struct intr_frame *f)
   }
 
   if (fault_page->status == IN_FILESYS){
-    bool success = true;
     struct frame* new_frame = (struct frame*)malloc(sizeof(struct frame));
     frame_alloc(new_frame);
     pagedir_set_accessed(new_frame->t->pagedir, new_frame->kpage, true);
@@ -202,7 +202,6 @@ page_fault (struct intr_frame *f)
       return;
   }
   else if(fault_page->status == IN_SWAP_TABLE){
-    bool success = true;
     struct frame* new_frame = (struct frame*)malloc(sizeof(struct frame));
     frame_alloc(new_frame);
     pagedir_set_accessed(new_frame->t->pagedir, new_frame->kpage, true);
