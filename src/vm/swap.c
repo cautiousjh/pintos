@@ -13,8 +13,9 @@ struct block *swap_table;
 void 
 swap_init(void)
 {
+	blocks = bitmap_create(1<<10);
+	//blocks = bitmap_create(block_size(swap_table)/PGSIZE*BLOCK_SECTOR_SIZE);
 	swap_table = block_get_role(BLOCK_SWAP);
-	blocks = bitmap_create(block_size(swap_table)/PGSIZE*BLOCK_SECTOR_SIZE);
 	lock_init(&block_lock);
 }
 
