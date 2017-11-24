@@ -81,6 +81,6 @@ frame_evict(struct frame* f)
 		if(temp_frame->kpage)
 			frame_swap(temp_frame); 		
   	}
-}
 	free(temp_frame);
 	return NULL;
+}
