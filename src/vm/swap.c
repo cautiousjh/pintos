@@ -29,6 +29,7 @@ swap_in(struct page* p)
 		block_read(swap_table, p->sector*PGSIZE/BLOCK_SECTOR_SIZE+i, 
 				   p->frame_entry->kpage + i*BLOCK_SECTOR_SIZE);
 	}
+	bitmap_reset(blocks,p->sector);
 	lock_release(&block_lock);
 
 }
@@ -44,7 +45,6 @@ swap_out(struct page* p)
 	for(i=0;i<PGSIZE/BLOCK_SECTOR_SIZE;i++)
 		block_write(swap_table, p->sector*PGSIZE/BLOCK_SECTOR_SIZE+i, 
 				   p->frame_entry->kpage + i*BLOCK_SECTOR_SIZE);
-	bitmap_reset(blocks,p->sector);
 	lock_release(&block_lock);
 }
 
