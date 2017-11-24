@@ -104,5 +104,7 @@ frame_swap(struct frame* victim)
 	victim->related_page->status = IN_SWAP_TABLE;
 	victim->related_page->kpage = victim->kpage;
 	pagedir_clear_page(victim->t->pagedir, victim->related_page->addr);
+  	list_remove(&victim->elem);
+	palloc_free_page(victim->kpage);
 	return NULL;
 }
