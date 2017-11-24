@@ -98,20 +98,3 @@ frame_swap(struct frame* victim)
 	pagedir_clear_page(victim->t->pagedir, victim->related_page->addr);
 	return NULL;
 }
-
-unsigned
-frame_hash_func(const struct hash_elem *e,void *aux UNUSED)
-{
-	const struct frame* f = hash_entry(e, struct frame, elem);
-	return hash_bytes(&f->upage, sizeof(f->upage));
-}
-
-bool 
-frame_less_func(const struct hash_elem *_a,
-                const struct hash_elem *_b,
-                void *aux UNUSED)
-{
-	struct frame* a = hash_entry(_a, struct frame, elem);
-	struct frame* b = hash_entry(_b, struct frame, elem);
-	return a->upage != b->upage? a->upage < b->upage : a->t->tid < b->t->tid;
-}
