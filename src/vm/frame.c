@@ -44,7 +44,7 @@ free_frame (struct frame* f)
 
 
 void* 
-frame_evict(struct frame* f)
+frame_evict(struct frame* f) 
 {
 	struct frame* temp_frame;
 	struct hash_iterator iter;
@@ -55,10 +55,8 @@ frame_evict(struct frame* f)
 		if(temp_frame->kpage){
 			if(pagedir_is_accessed(temp_frame->t->pagedir, temp_frame->related_page->addr))
 				pagedir_set_accessed(temp_frame->t->pagedir, temp_frame->related_page->addr, false);
-			else{
-				lock_release(&frame_lock);
+			else
 				return frame_swap(f, temp_frame);
-			}
 		}
 	}
 
@@ -66,20 +64,16 @@ frame_evict(struct frame* f)
 	while(hash_next(&iter)){
 		temp_frame = hash_entry(hash_cur(&iter), struct frame, elem);
 		if(temp_frame->kpage){
-			if(!pagedir_is_dirty(temp_frame->t->pagedir, temp_frame->related_page->addr)){
-				lock_release(&frame_lock);
+			if(!pagedir_is_dirty(temp_frame->t->pagedir, temp_frame->related_page->addr))
 				return frame_swap(f, temp_frame);
-			}
 		}
 	}
 
 	hash_first(&iter, &frames);
 	while(hash_next(&iter)){
 		temp_frame = hash_entry(hash_cur(&iter), struct frame, elem);
-		if(temp_frame->kpage){
-			lock_release(&frame_lock);
+		if(temp_frame->kpage)
 			return frame_swap(f, temp_frame);
-		}
 	}
 
 	return NULL;
