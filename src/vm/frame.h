@@ -11,7 +11,6 @@
 
 struct list frames;
 
-
 struct frame{
 	void* kpage;
 	void* upage;
