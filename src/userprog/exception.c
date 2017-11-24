@@ -156,13 +156,6 @@ page_fault (struct intr_frame *f)
   if (fault_addr == NULL)
     syscall_exit(-1);
 
-  // 0xcccccccc
-  if(!user) { // kernel mode
-    f->eip = (void *) f->eax;
-    f->eax = 0xffffffff;
-    return;
-  }
-
   // newly added parts for VM
   struct page *fault_page = page_table_lookup(fault_addr);
 
