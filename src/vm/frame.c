@@ -55,46 +55,44 @@ frame_evict(struct frame* f)
 {
 	struct frame* temp_frame;
 	struct list_elem* iter;
+	bool finished = false;
 
   	for(iter = list_begin(&frames);
       	iter != list_end(&frames);
       	iter = iter->next){
+  		if(finishied) break;
   		temp_frame = list_entry(iter, struct frame, elem);
 		if(temp_frame->kpage)
 			if(pagedir_is_accessed(temp_frame->t->pagedir, temp_frame->related_page->addr))
 				pagedir_set_accessed(temp_frame->t->pagedir, temp_frame->related_page->addr, false);
-			else{
-				frame_swap(temp_frame);  
-  				list_remove(&temp_frame->elem);
-				free(temp_frame);
-				return;		
-			}
+			else
+				finished = true;
   	}
 
   	for(iter = list_begin(&frames);
       	iter != list_end(&frames);
       	iter = iter->next){
+  		if(finishied) break;
 		temp_frame = list_entry(iter, struct frame, elem);
 		if(temp_frame->kpage)
-			if(!pagedir_is_dirty(temp_frame->t->pagedir, temp_frame->related_page->addr)){
-				frame_swap(temp_frame);  
-  				list_remove(&temp_frame->elem);
-				free(temp_frame);
-				return;		
-			}		
+			if(!pagedir_is_dirty(temp_frame->t->pagedir, temp_frame->related_page->addr))
+				finished = true;
   	}
 
   	for(iter = list_begin(&frames);
       	iter != list_end(&frames);
       	iter = iter->next){
+  		if(finishied) break;
 		temp_frame = list_entry(iter, struct frame, elem);
-		if(temp_frame->kpage){
-			frame_swap(temp_frame);  
-  			list_remove(&temp_frame->elem);
-			free(temp_frame);
-			return;		
-		}		
+		if(temp_frame->kpage)
+				finished = true;
   	}
+	
+	frame_swap(temp_frame);  
+  	list_remove(&temp_frame->elem);
+	free(temp_frame);
+	return;		
+	
 }
 
 
