@@ -35,6 +35,7 @@ struct page
 
 	// swap table
 	int sector;
+	void *kpage;
 
 	struct hash_elem elem;
 };

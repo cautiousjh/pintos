@@ -33,7 +33,7 @@ frame_alloc(struct frame* new_frame)
 		new_frame->t = thread_current();
     	pagedir_set_accessed(new_frame->t->pagedir, new_frame->kpage, true);
 		lock_release(&frame_lock);
-		
+
       	hash_insert(&frames,&new_frame->elem);
 		return new_frame->kpage;
 	}
@@ -61,7 +61,7 @@ frame_evict(struct frame* f)
 			if(pagedir_is_accessed(temp_frame->t->pagedir, temp_frame->related_page->addr))
 				pagedir_set_accessed(temp_frame->t->pagedir, temp_frame->related_page->addr, false);
 			else
-				return frame_swap(temp_frame);
+				frame_swap(temp_frame);
 		}
 	}
 
@@ -70,7 +70,7 @@ frame_evict(struct frame* f)
 		temp_frame = hash_entry(hash_cur(&iter), struct frame, elem);
 		if(temp_frame->kpage){
 			if(!pagedir_is_dirty(temp_frame->t->pagedir, temp_frame->related_page->addr))
-				return frame_swap(temp_frame);
+				frame_swap(temp_frame);
 		}
 	}
 
@@ -78,9 +78,9 @@ frame_evict(struct frame* f)
 	while(hash_next(&iter)){
 		temp_frame = hash_entry(hash_cur(&iter), struct frame, elem);
 		if(temp_frame->kpage)
-			return frame_swap(temp_frame);
+			frame_swap(temp_frame);
 	}
-
+	free(temp_frame);
 	return NULL;
 }
 
@@ -91,6 +91,7 @@ frame_swap(struct frame* victim)
 	swap_out(victim->related_page);
 	victim->related_page->frame_entry = NULL;
 	victim->related_page->status = IN_SWAP_TABLE;
+	victim->related_page->kpage = victim->kpage;
 	palloc_free_page(victim->kpage);
 	pagedir_clear_page(victim->t->pagedir, victim->related_page->addr);
 	return NULL;

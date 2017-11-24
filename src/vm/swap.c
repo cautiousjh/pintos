@@ -23,7 +23,6 @@ void
 swap_in(struct page* p)
 {
 	int i;
-
 	lock_acquire(&block_lock);
 	for(i=0;i<PGSIZE/BLOCK_SECTOR_SIZE;i++){
 		block_read(swap_table, p->sector*PGSIZE/BLOCK_SECTOR_SIZE+i, 
