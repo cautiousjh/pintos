@@ -43,7 +43,7 @@ struct page
 
 void page_table_init(struct hash* page_table);
 
-void page_table_destroy(struct hash* page_table);
+void page_destructor(struct hash_elem* e, void* aux UNUSED);
 
 void add_page(struct thread* t, struct page* p);
 
