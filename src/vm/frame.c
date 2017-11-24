@@ -64,9 +64,9 @@ frame_evict(struct frame* f)
 			if(pagedir_is_accessed(temp_frame->t->pagedir, temp_frame->related_page->addr))
 				pagedir_set_accessed(temp_frame->t->pagedir, temp_frame->related_page->addr, false);
 			else{
+				frame_swap(temp_frame);  
   				list_remove(&temp_frame->elem);
 				free(temp_frame);
-				frame_swap(temp_frame);  
 				return;		
 			}
   	}
@@ -77,9 +77,9 @@ frame_evict(struct frame* f)
 		temp_frame = list_entry(iter, struct frame, elem);
 		if(temp_frame->kpage)
 			if(!pagedir_is_dirty(temp_frame->t->pagedir, temp_frame->related_page->addr)){
+				frame_swap(temp_frame);  
   				list_remove(&temp_frame->elem);
 				free(temp_frame);
-				frame_swap(temp_frame);  
 				return;		
 			}		
   	}
@@ -89,9 +89,9 @@ frame_evict(struct frame* f)
       	iter = iter->next){
 		temp_frame = list_entry(iter, struct frame, elem);
 		if(temp_frame->kpage){
+			frame_swap(temp_frame);  
   			list_remove(&temp_frame->elem);
 			free(temp_frame);
-			frame_swap(temp_frame);  
 			return;		
 		}		
   	}
