@@ -154,7 +154,7 @@ page_fault (struct intr_frame *f)
 
   // check whether fault_page is valid or not
   if (fault_addr == NULL || is_kernel_vaddr(fault_addr))
-    PANIC("");//syscall_exit(-1);
+    syscall_exit(-1);
 
   // newly added parts for VM
   struct page *fault_page = page_table_lookup(fault_addr);
