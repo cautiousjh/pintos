@@ -25,7 +25,6 @@ swap_in(struct page* p)
 	int i;
 
 	lock_acquire(&block_lock);
-	p->sector = bitmap_scan_and_flip(blocks, 0, 1, false);
 	for(i=0;i<PGSIZE/BLOCK_SECTOR_SIZE;i++){
 		block_read(swap_table, p->sector*PGSIZE/BLOCK_SECTOR_SIZE+i, 
 				   p->frame_entry->kpage + i*BLOCK_SECTOR_SIZE);
@@ -41,6 +40,7 @@ swap_out(struct page* p)
 	int i;
 
 	lock_acquire(&block_lock);
+	p->sector = bitmap_scan_and_flip(blocks, 0, 1, false);
 	for(i=0;i<PGSIZE/BLOCK_SECTOR_SIZE;i++)
 		block_write(swap_table, p->sector*PGSIZE/BLOCK_SECTOR_SIZE+i, 
 				   p->frame_entry->kpage + i*BLOCK_SECTOR_SIZE);
