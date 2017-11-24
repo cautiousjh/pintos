@@ -48,5 +48,8 @@ swap_out(struct page* p)
 }
 
 void swap_reset(struct page* p){
+	lock_acquire(&block_lock);
+	bitmap_reset(blocks, p->sector);
+	lock_release(&block_lock);
 
 }

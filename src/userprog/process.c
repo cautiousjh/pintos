@@ -189,6 +189,8 @@ process_exit (void)
   else
     child_temp->isValid = false;
 
+  //
+
   /* Destroy the current process's page directory and switch back
      to the kernel-only page directory. */
   pd = curr_thread->pagedir;

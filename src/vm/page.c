@@ -14,7 +14,17 @@ page_table_init(struct hash* page_table)
 void
 page_table_destroy(struct hash* page_table)
 {
-	return;
+	struct hash_iter iter;
+	while(hash_next(&iter)){
+		struct page* page_temp = hash_entry(hash_cur(&iter), struct page, elem);
+		if(page_temp->frame_entry){
+			free_frame(page_temp->frame_entry);
+			page_temp->frame_entry = NULL;
+		}
+		if(page_temp->sector != -1)
+			swap_reset(page_temp);
+		free(page_temp);
+	}
 }
 
 void
