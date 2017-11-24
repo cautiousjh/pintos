@@ -169,7 +169,8 @@ process_exit (void)
   struct list_elem* iter;
   struct child_thread* child_temp;
 
-  hash_destroy(&curr_thread->page_table, page_destructor);
+  //FAILED....
+  //hash_destroy(&curr_thread->page_table, page_destructor);
 
   // find itself in parent's children list
   for(iter = list_begin(&curr_thread->parent->children);
