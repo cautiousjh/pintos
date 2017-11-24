@@ -170,7 +170,7 @@ process_exit (void)
   struct child_thread* child_temp;
 
   //FAILED....
-  //hash_destroy(&curr_thread->page_table, page_destructor);
+  hash_destroy(&curr_thread->page_table, page_destructor);
 
   // find itself in parent's children list
   for(iter = list_begin(&curr_thread->parent->children);
