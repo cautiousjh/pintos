@@ -2,6 +2,7 @@
 #include <debug.h>
 
 #include "threads/palloc.h"
+#include "userprog/pagedir.h"
 
 static struct lock frame_lock;
 
