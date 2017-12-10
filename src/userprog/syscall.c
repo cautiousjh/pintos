@@ -10,8 +10,6 @@
 #include "filesys/file.h"
 #include "filesys/filesys.h"
 #include "devices/shutdown.h"
-#include "vm/frame.h"
-#include "vm/page.h"
 
 #define ASSERT_EXIT( COND ) { if(!(COND)) syscall_exit(-1); }
 
@@ -79,12 +77,6 @@ syscall_handler (struct intr_frame *f UNUSED)
     case SYS_CLOSE:
     	syscall_close(*((char**)(f->esp)+1)); 
      	break;
-    case SYS_MMAP:
-    	f->eax = syscall_mmap(*((int*)(f->esp)+1),*((unsigned*)(f->esp)+2));
-    	break;
-    case SYS_MUNMAP:
-    	syscall_munmap(*((mapid_t*)(f->esp)+1));
-    	break;
     default: break;
   }
 }
@@ -156,8 +148,6 @@ syscall_open(const char* name)
 	felem = malloc(sizeof(struct file_elem));
 	felem->fd = set_new_fd();
 	felem->this_file = open_file;
-	felem->mmapid = -1;
-	felem->addr = NULL;
 	list_push_back(&thread_current()->fd_list, &felem->elem);
 
 	return felem->fd;
@@ -195,8 +185,6 @@ syscall_write(int fd, char* buffer, off_t size)
 		putbuf(buffer,size);
 		return size;
 	}
-
-  	//pagedir_set_dirty(thread_current()->->pagedir, , false);
 	return file_write(get_file_elem(fd)->this_file, buffer, size);
 }
 void
@@ -219,8 +207,6 @@ syscall_close(int fd)
 	ASSERT_EXIT(get_file_elem(fd)->this_file);
 	if(fd == STDOUT_FILENO || fd == STDIN_FILENO)
 		return;
-	if(!get_file_elem(fd)->addr)
-		syscall_munmap(get_file_elem(fd)->mmapid);
 	ASSERT_EXIT(close_file(fd));
 }
 
@@ -297,118 +283,4 @@ set_new_fd(void){
 	lock_release(&file_lock);
 
 	return new_fd;
-}
-
-
-mapid_t 
-syscall_mmap (int fd, void *addr)
-{
-	struct file_elem* felem;
-	struct thread* curr_thread = thread_current();
-	size_t ofs;
-
-	// fd, addr0, addr aligned validation
-	if(fd<=1 || addr == NULL || (uint32_t)addr%PGSIZE)
-		return -1;
-
-	lock_acquire(&file_lock);
-	
-	// file validation
-	felem = get_file_elem(fd);
-	if(felem->this_file == NULL){
-		lock_release(&file_lock);
-		return -1;
-	}
-
-	//file size validation
-	size_t file_size = file_length(felem->this_file);
-	if(file_size==0){
-		lock_release(&file_lock);
-		return -1;
-	}
-
-	// page duplicated validation
-	for(ofs = 0; ofs < file_size; ofs+=PGSIZE){
-		if(page_table_lookup(addr+ofs)){
-			lock_release(&file_lock);
-			return -1;
-		}
-	}
-
-	// page mapping
-	for(ofs = 0; ofs < file_size; ofs+=PGSIZE){
-		size_t read_bytes = ofs+PGSIZE < file_size? PGSIZE : file_size-ofs;
-
-		struct page* new_page = (struct page*)malloc(sizeof(struct page));
-		new_page->addr = addr + ofs;
-		new_page->frame_entry = NULL;
-		new_page->writable = true; 
-		new_page->status = IN_FILESYS;
-		new_page->in_stack_page = false;
-		new_page->file_ptr = felem->this_file;
-		new_page->offset = ofs;
-		new_page->read_bytes = read_bytes;
-		new_page->sector = -1;
-		add_page(curr_thread, new_page);
-	}
-
-	// mmapid mapping
-	curr_thread->mmapid_cnt++;
-	felem->mmapid = curr_thread->mmapid_cnt;
-	felem->addr = addr;
-
-	lock_release(&file_lock);
-
-	return felem->mmapid;
-}
-
-void 
-syscall_munmap (mapid_t mmapid)
-{
-	struct file_elem* felem = NULL;
-	struct list_elem* iter;
-	struct page* unmap_page;
-	size_t ofs, file_size;
-	struct thread* curr_thread = thread_current();
-
-	// mmapid validation
-	if(mmapid > curr_thread->mmapid_cnt)
-		return;
-
-	lock_acquire(&file_lock);
-
-	// find file_elem
-	for(iter = list_begin(&curr_thread->fd_list);
-		iter!= list_end(&curr_thread->fd_list);
-		iter = iter->next){
-		felem = list_entry(iter, struct file_elem, elem);
-		if(felem->mmapid == mmapid)
-			break;
-	}
-
-	// iterate each page
-	if(iter != list_end(&curr_thread->fd_list)){
-		file_size = file_length(felem->this_file);
-		for(ofs=0; ofs<file_size; ofs+=PGSIZE){
-			size_t bytes = ofs+PGSIZE < file_size? PGSIZE : file_size-ofs;
-			unmap_page = page_table_lookup(felem->addr+ofs);
-			if(unmap_page == NULL)
-				continue;
-
-			if(unmap_page->status == IN_FRAME_TABLE)
-				if(pagedir_is_dirty(curr_thread->pagedir,unmap_page->addr))
-					file_write_at(felem->this_file, unmap_page->addr, bytes, ofs);
-			else if(unmap_page->status == IN_SWAP_TABLE){
-				return;
-			}
-			// free
-			felem->addr = NULL;
-			free_frame(unmap_page->frame_entry);
-			free(unmap_page->frame_entry);
-			pagedir_clear_page(curr_thread->pagedir, unmap_page->addr);
-		}
-	}
-
-	lock_release(&file_lock);
-
 }

@@ -1,23 +1,16 @@
 #include "userprog/exception.h"
 #include "userprog/syscall.h"
-#include "userprog/process.h"
 #include <inttypes.h>
 #include <stdio.h>
-#include <string.h>
 #include "userprog/gdt.h"
-#include "userprog/pagedir.h"
 #include "threads/interrupt.h"
 #include "threads/thread.h"
-#include "threads/vaddr.h"
-#include "vm/frame.h"
-#include "vm/page.h"
 
 /* Number of page faults processed. */
 static long long page_fault_cnt;
 
 static void kill (struct intr_frame *);
 static void page_fault (struct intr_frame *);
-bool stack_growth (void* fault_addr);
 
 /* Registers handlers for interrupts that can be caused by user
    programs.
@@ -135,7 +128,6 @@ page_fault (struct intr_frame *f)
   bool user;         /* True: access by user, false: access by kernel. */
   void *fault_addr;  /* Fault address. */
 
-  bool success = true;
   /* Obtain faulting address, the virtual address that was
      accessed to cause the fault.  It may point to code or to
      data.  It is not necessarily the address of the instruction
@@ -152,80 +144,12 @@ page_fault (struct intr_frame *f)
   /* Count page faults. */
   page_fault_cnt++;
 
-  // check whether fault_page is valid or not
-  if (fault_addr == NULL)
-    syscall_exit(-1);
-
-  // newly added parts for VM
-  struct page *fault_page = page_table_lookup(fault_addr);
-
-  // no page -> stack growth
-  if(fault_page == NULL){
-    //validity
-    if(is_kernel_vaddr(fault_addr) || 
-       fault_addr < (f->esp)-32 || fault_addr > (f->esp)+32)
-      syscall_exit(-1);
-
-    if(!stack_growth(fault_addr))
-      syscall_exit(-1);
-
-    return;
-  }
-
-  if (fault_page->status == IN_FILESYS){
-    struct frame* new_frame = (struct frame*)malloc(sizeof(struct frame));
-    frame_alloc(new_frame);
-    pagedir_set_accessed(new_frame->t->pagedir, new_frame->kpage, true);
-    pagedir_set_dirty(new_frame->t->pagedir, new_frame->kpage, false);
-    new_frame->related_page = fault_page;
-
-    // load the page
-    if(file_read_at(fault_page->file_ptr, new_frame->kpage,
-                    fault_page->read_bytes, fault_page->offset) !=
-        (int) fault_page->read_bytes)
-    {
-      free_frame(new_frame);
-      success = false;
-    }
-    // fill rest with 0
-    //if(PGSIZE - fault_page->read_bytes != 0)
-    //  memset (new_frame->kpage + fault_page->read_bytes, 0, PGSIZE - fault_page->read_bytes);
-
-    // install page into frame
-    if(!install_page(fault_page->addr, new_frame->kpage, fault_page->writable))
-      success = false;
-
-    fault_page->status = IN_FRAME_TABLE;
-    fault_page->frame_entry = new_frame;
-    if(success)
-      return;
-  }
-  else if(fault_page->status == IN_SWAP_TABLE){
-    struct frame* new_frame = (struct frame*)malloc(sizeof(struct frame));
-    frame_alloc(new_frame);
-    pagedir_set_accessed(new_frame->t->pagedir, new_frame->kpage, true);
-    pagedir_set_dirty(new_frame->t->pagedir, new_frame->kpage, false);
-    new_frame->related_page = fault_page;
-
-    fault_page->kpage = new_frame->kpage;
-    fault_page->status = IN_FRAME_TABLE;
-    fault_page->frame_entry = new_frame;    
-
-    swap_in(fault_page);
-
-    // install page into frame
-    if(!install_page(fault_page->addr, new_frame->kpage, fault_page->writable))
-      success = false;
-    if(success)
-      return;
-  }
   /* Determine cause. */
   not_present = (f->error_code & PF_P) == 0;
   write = (f->error_code & PF_W) != 0;
   user = (f->error_code & PF_U) != 0;
 
-  if(!not_present && write)
-    syscall_exit(-1);
+  syscall_exit(-1);
 
   // in case of page fault (REF 3.1.5. Accewssing User Memory)
 
@@ -240,35 +164,3 @@ page_fault (struct intr_frame *f)
   kill (f);
 }
 
-
-bool
-stack_growth(void* fault_addr)
-{
-  struct thread* curr_thread = thread_current();
-
-  // check max growth
-  if(curr_thread->stack_page_cnt > STACK_PAGE_MAX_NUM)
-    return false;
-
-  struct page*  new_page  = (struct page*)malloc(sizeof(struct page));
-  struct frame* new_frame = (struct frame*)malloc(sizeof(struct frame));
-  frame_alloc(new_frame);
-  new_frame->related_page = new_page;
-
-  curr_thread->stack_page_cnt++;
-  curr_thread->esp = (uint8_t *)PHYS_BASE - curr_thread->stack_page_cnt * PGSIZE;
-
-  // setting
-  new_page->addr = curr_thread->esp;
-  new_page->frame_entry = new_frame;
-  new_page->writable = true;
-  new_page->status = IN_FRAME_TABLE;
-  new_page->in_stack_page = true;
-  add_page(curr_thread, new_page);
-
-  // install
-  if(!install_page(new_page->addr, new_frame->kpage, true))
-    return false;
-
-  return true;
-}
