@@ -118,6 +118,9 @@ struct thread
     struct file* exe_file;
     struct list children;
     struct list fd_list;
+    
+    struct list_elem sleepElem;
+    int64_t wakeup_time;
 #endif
 
     /* Owned by thread.c. */
