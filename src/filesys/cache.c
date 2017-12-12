@@ -124,7 +124,7 @@ void update_cache_history(int target){
 void cache_read_lock(struct cache_block* c){
 	lock_acquire(&c->cache_lock);
 	while(c->hasWriter)
-		cond_wait(&c->cache_cond,&c->cache_lock);
+		cond_wait(&c->cache_condvar,&c->cache_lock);
 	c->reader_cnt++;
 	lock_release(&c->cache_lock);
 }
@@ -132,19 +132,19 @@ void cache_read_unlock(struct cache_block* c){
 	lock_acquire(&c->cache_lock);
 	c->reader_cnt--;
 	if(c->reader_cnt==0)
-		cond_broadcast(&c->cache_cond,&c->cache_lock);
+		cond_broadcast(&c->cache_condvar,&c->cache_lock);
 	lock_release(&c->cache_lock);
 }
 void cache_write_lock(struct cache_block* c){
 	lock_acquire(&c->cache_lock);
 	target_cache->isDirty = true;
 	if(c->hasWriter || c->reader_cnt > 0)
-		cond_wait(&c->cache_cond,&c->cache_lock);
+		cond_wait(&c->cache_condvar,&c->cache_lock);
 	lock_release(&c->cache_lock);
 }
 void cache_write_unlock(struct cache_block* c){
 	lock_acquire(&c->cache_lock);
 	c->hasWriter = false;
-	cond_broadcast(&c->cache_cond,&c->cache_lock);
+	cond_broadcast(&c->cache_condvar,&c->cache_lock);
 	lock_release(&c->cache_lock);
 }
