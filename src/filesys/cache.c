@@ -1,5 +1,5 @@
-#include "thread/malloc.h"
-#include "thread/synch.h"
+#include "threads/malloc.h"
+#include "threads/synch.h"
 #include "filesys/cache.h"
 
 struct cache_block{
