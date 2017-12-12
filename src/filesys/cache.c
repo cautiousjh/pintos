@@ -25,16 +25,17 @@ struct cache_block* cache_array;
 int cache_history[CACHE_SIZE_MAX];
 struct lock eviction_lock;
 
+void update_cache_history(int target);
 void cache_read_lock(struct cache_block* c);
 void cache_read_unlock(struct cache_block* c);
 void cache_write_lock(struct cache_block* c);
 void cache_write_unlock(struct cache_block* c);
 
 
-void cache_init()
+void cache_init(void)
 {
 	int i;
-	init_lock(&eviction_lock);
+	lock_init(&eviction_lock);
 	cache_array = (struct cache_block*)malloc(CACHE_SIZE_MAX*sizeof(struct cache_block));
 	for(i=0;i<CACHE_SIZE_MAX;i++){
 		// for cache history
@@ -137,7 +138,7 @@ void cache_read_unlock(struct cache_block* c){
 }
 void cache_write_lock(struct cache_block* c){
 	lock_acquire(&c->cache_lock);
-	target_cache->isDirty = true;
+	c->isDirty = true;
 	if(c->hasWriter || c->reader_cnt > 0)
 		cond_wait(&c->cache_condvar,&c->cache_lock);
 	lock_release(&c->cache_lock);
