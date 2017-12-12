@@ -62,6 +62,7 @@ static struct list open_inodes;
 void
 inode_init (void) 
 {
+  cache_init();
   list_init (&open_inodes);
 }
 
@@ -90,16 +91,16 @@ inode_create (block_sector_t sector, off_t length)
       disk_inode->magic = INODE_MAGIC;
       if (free_map_allocate (sectors, &disk_inode->start)) 
         {
-          //cache_write(sector,disk_inode);
-          block_write (fs_device, sector, disk_inode);
+          cache_write(sector,disk_inode);
+          //block_write (fs_device, sector, disk_inode);
           if (sectors > 0) 
             {
               static char zeros[BLOCK_SECTOR_SIZE];
               size_t i;
               
               for (i = 0; i < sectors; i++) 
-                //cache_write(disk_inode->start + i, zeros);
-                block_write (fs_device, disk_inode->start + i, zeros);
+                cache_write(disk_inode->start + i, zeros);
+                //block_write (fs_device, disk_inode->start + i, zeros);
             }
           success = true; 
         } 
