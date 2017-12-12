@@ -1,6 +1,11 @@
+#include "filesys/cache.h"
+#include <stdlib.h>
+#include <stdbool.h>
 #include "threads/malloc.h"
 #include "threads/synch.h"
-#include "filesys/cache.h"
+#include "devices/block.h"
+#include "devices/timer.h"
+#include "filesys/filesys.h"
 
 struct cache_block{
 
@@ -29,7 +34,6 @@ void cache_write_unlock(struct cache_block* c);
 void cache_init()
 {
 	int i;
-	global_cache_num = 0;
 	init_lock(&eviction_lock);
 	cache_array = (struct cache_block*)malloc(CACHE_SIZE_MAX*sizeof(struct cache_block));
 	for(i=0;i<CACHE_SIZE_MAX;i++){
