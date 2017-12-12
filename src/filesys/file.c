@@ -2,6 +2,7 @@
 #include <debug.h>
 #include "filesys/inode.h"
 #include "threads/malloc.h"
+#include "filesys/cache.h"
 
 /* An open file. */
 struct file 
@@ -51,6 +52,7 @@ file_close (struct file *file)
       inode_close (file->inode);
       free (file); 
     }
+    cache_flush();
 }
 
 /* Returns the inode encapsulated by FILE. */
