@@ -25,6 +25,7 @@ struct cache_block* cache_array;
 int cache_history[CACHE_SIZE_MAX];
 struct lock eviction_lock;
 
+struct cache_block* get_cache_block(block_sector_t sector);
 void update_cache_history(int target);
 void cache_read_lock(struct cache_block* c);
 void cache_read_unlock(struct cache_block* c);
@@ -115,7 +116,7 @@ void cache_flush(void){
 		for(i=0;i<CACHE_SIZE_MAX;i++){
 			iter_cache = cache_array + i;
 			if(iter_cache->isDirty)
-				block_write(fs_device, target_cache->sector,target_cache->data);
+				block_write(fs_device, iter_cache->sector,iter_cache->data);
 		}
 		free(cache_array);
 	}
