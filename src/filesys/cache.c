@@ -42,6 +42,7 @@ void cache_init(void)
 		// for cache history
 		cache_history[i] = i;
 		// for each cache entry
+		cache_array[i].sector = -1;
 		cache_array[i].isDirty = false;
 		cache_array[i].reader_cnt = 0;
 		cache_array[i].hasWriter = false;
