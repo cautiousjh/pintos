@@ -107,7 +107,18 @@ void cache_write(block_sector_t sector, void* buffer)
 	cache_write_lock(target_cache);
 	memcpy(target_cache->data, buffer, BLOCK_SECTOR_SIZE);
 	cache_write_unlock(target_cache);
-
+}
+void cache_flush(void){
+	int i;
+	struct cache_block* iter_cache;
+	if(!cache_array){
+		for(i=0;i<CACHE_SIZE_MAX;i++){
+			iter_cache = cache_array + i;
+			if(iter_cache->isDirty)
+				block_write(fs_device, target_cache->sector,target_cache->data);
+		}
+		free(cache_array);
+	}
 }
 
 
