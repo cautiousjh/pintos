@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include "threads/malloc.h"
 #include "threads/synch.h"
+#include "threads/thread.h"
 #include "devices/block.h"
 #include "devices/timer.h"
 #include "filesys/filesys.h"
@@ -32,6 +33,8 @@ void cache_read_unlock(struct cache_block* c);
 void cache_write_lock(struct cache_block* c);
 void cache_write_unlock(struct cache_block* c);
 
+void write_back_thread_function(void* aux);
+
 
 void cache_init(void)
 {
@@ -49,6 +52,7 @@ void cache_init(void)
 		lock_init(&cache_array[i].cache_lock);
 		cond_init(&cache_array[i].cache_condvar);
 	}
+	thread_create("bgndWriteBackThread",0,write_back_thread_function,NULL)
 }
 
 struct cache_block* get_cache_block(block_sector_t sector)
@@ -116,8 +120,10 @@ void cache_flush(){
 	if(!cache_array){
 		for(i=0;i<CACHE_SIZE_MAX;i++){
 			iter_cache = cache_array + i;
-			if(iter_cache->isDirty)
+			if(iter_cache->isDirty){
+				iter_cache->isDirty = false;
 				block_write(fs_device, iter_cache->sector,iter_cache->data);
+			}
 		}
 	}
 }
@@ -160,4 +166,13 @@ void cache_write_unlock(struct cache_block* c){
 	c->hasWriter = false;
 	cond_broadcast(&c->cache_condvar,&c->cache_lock);
 	lock_release(&c->cache_lock);
+}
+
+
+void write_back_thread_function(void* aux){
+	int i;
+	while(true){
+		timer_sleep(WRITE_BACK_PERIOD);
+		cache_flush();
+	}
 }
