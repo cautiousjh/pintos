@@ -247,7 +247,7 @@ inode_close (struct inode *inode)
         }
       else
       {
-        ;//if(inode)
+        cache_write(inode->sector,&inode->data);//if(inode)
 
       }
 
@@ -338,8 +338,7 @@ inode_write_at (struct inode *inode, const void *buffer_, off_t size,
     return 0;
 
   if(inode_length(inode) < size+offset)
-    if(inode_extend(&inode->data, size+offset))
-        cache_write(inode->sector, inode->data);
+    inode_extend(&inode->data, size+offset);
 
   while (size > 0) 
     {
