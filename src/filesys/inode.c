@@ -122,9 +122,10 @@ inode_create (block_sector_t sector, off_t length)
         disk_inode->direct_idx[i] = NULL_SECTOR;
       disk_inode->indirect_idx = NULL_SECTOR;
       disk_inode->double_indirect_idx = NULL_SECTOR;
-      disk_inode->start = sector;
+      //disk_inode->start = sector;
       success = inode_extend(disk_inode,length);
-      // if success-> block_write block_read data
+      if(success)
+        block_write(fs_device,sector, disk_inode);
       free(disk_inode);
     }
   return success;
