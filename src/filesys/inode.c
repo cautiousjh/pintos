@@ -220,7 +220,7 @@ inode_close (struct inode *inode)
             num_to_remove--;
           }
           if(inode->data.indirect_idx != NULL_SECTOR)
-            free_map_release(inode->data.indirect_index,1);
+            free_map_release(inode->data.indirect_idx,1);
 
           //reset
 
