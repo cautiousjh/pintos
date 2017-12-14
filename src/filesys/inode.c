@@ -294,7 +294,7 @@ inode_read_at (struct inode *inode, void *buffer_, off_t size, off_t offset)
         {
           /* Read full sector directly into caller's buffer. */
           cache_read (sector_idx, buffer + bytes_read);
-printf("CACHE READ: %d, FULL\n",sector_idx);
+printf("CACHE READ: %u, FULL\n",sector_idx);
         }
       else 
         {
@@ -307,7 +307,7 @@ printf("CACHE READ: %d, FULL\n",sector_idx);
                 break;
             }
           cache_read (sector_idx, bounce);
-printf("CACHE READ: %d, %d\n",sector_idx, bounce);
+printf("CACHE READ: %u, %u\n",sector_idx, bounce);
           memcpy (buffer + bytes_read, bounce + sector_ofs, chunk_size);
         }
       
@@ -360,7 +360,7 @@ inode_write_at (struct inode *inode, const void *buffer_, off_t size,
         {
           /* Write full sector directly to disk. */
           cache_write(sector_idx, buffer + bytes_written);
-printf("CACHE WRITE: %d, FULL\n",sector_idx);
+printf("CACHE WRITE: %u, FULL\n",sector_idx);
         }
       else 
         {
@@ -381,7 +381,7 @@ printf("CACHE WRITE: %d, FULL\n",sector_idx);
             memset (bounce, 0, BLOCK_SECTOR_SIZE);
           memcpy (bounce + sector_ofs, buffer + bytes_written, chunk_size);
           cache_write(sector_idx, bounce);
-printf("CACHE_WRITE: %d, %d\n", bounce);
+printf("CACHE_WRITE: %u, %u\n", bounce);
         }
 
       /* Advance. */
