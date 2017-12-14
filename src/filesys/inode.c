@@ -112,7 +112,7 @@ inode_create (block_sector_t sector, off_t length)
      one sector in size, and you should fix that. */
   ASSERT (sizeof *disk_inode == BLOCK_SECTOR_SIZE);
 
-  //disk_inode = calloc (1, sizeof *disk_inode);
+  disk_inode = calloc (1, sizeof *disk_inode);
   if (disk_inode != NULL)
     {
       // initialization
