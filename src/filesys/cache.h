@@ -4,7 +4,7 @@
 #include "devices/block.h"
 
 #define CACHE_SIZE_MAX 64
-#define WRITE_BACK_PERIOD 1064
+#define WRITE_BACK_PERIOD 1024
 
 void cache_init(void);
 void cache_read(block_sector_t, void*);

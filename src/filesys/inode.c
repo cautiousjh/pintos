@@ -189,6 +189,9 @@ inode_get_inumber (const struct inode *inode)
 void
 inode_close (struct inode *inode) 
 {
+  int i,j, num_to_remove;
+  block_sector_t indirect_block[NUM_INDIRECT_BLOCK];
+  block_sector_t double_indirect_block[NUM_INDIRECT_BLOCK];
   /* Ignore null pointer. */
   if (inode == NULL)
     return;
@@ -203,9 +206,50 @@ inode_close (struct inode *inode)
       if (inode->removed) 
         {
           free_map_release (inode->sector, 1);
-          free_map_release (inode->data.start,
-                            bytes_to_sectors (inode->data.length)); 
+          num_to_remove = bytes_to_sectors(inode->data.length);
+          // remove direct
+          for(i=0;i<NUM_DIRECT_BLOCK && num_to_remove;i++){
+            free_map_release(inode->data.direct_idx[i], 1);
+            num_to_remove--;
+          }
+          // remove indirect
+          if(num_to_remove)
+            cache_read(inode->data.indirect_idx,&indirect_block);
+          for(i=0;i<NUM_INDIRECT_BLOCK && num_to_remove;i++){
+            free_map_release(indirect_block[i],1);
+            num_to_remove--;
+          }
+          if(inode->data.indirect_idx != NULL_SECTOR)
+            free_map_release(inode->data.indirect_index,1);
+
+          //reset
+
+          // remove double indirect
+          if(num_to_remove)
+            cache_read(inode->data.double_indirect_idx,&double_indirect_block);
+          for(i=0;i<NUM_INDIRECT_BLOCK && num_to_remove;i++){
+            if(double_indirect_block[i] != NULL_SECTOR){
+              // reset
+              for(j=0;j<NUM_INDIRECT_BLOCK;j++)
+                indirect_block[j] = NULL_SECTOR;
+              // get and remove single indirect
+              cache_read(double_indirect_block[i], &indirect_block);
+              for(j=0;j<NUM_INDIRECT_BLOCK && num_to_remove;j++){
+                free_map_release(indirect_block[j],1);
+                num_to_remove--;
+              }
+              if(double_indirect_block[i] != NULL_SECTOR)
+                free_map_release(double_indirect_block[i],1);
+            }
+          }
+          if(inode->data.double_indirect_idx != NULL_SECTOR)
+            free_map_release(inode->data.double_indirect_idx,1);
         }
+      else
+      {
+        ;//if(inode)
+
+      }
 
       free (inode); 
     }
@@ -314,7 +358,7 @@ inode_write_at (struct inode *inode, const void *buffer_, off_t size,
         {
           /* Write full sector directly to disk. */
           cache_write(sector_idx, buffer + bytes_written);
-          //block_write (fs_device, sector_idx, buffer + bytes_written);
+//printf("CACHE WRITE: %d, FULL",sector_idx);
         }
       else 
         {
@@ -335,7 +379,7 @@ inode_write_at (struct inode *inode, const void *buffer_, off_t size,
             memset (bounce, 0, BLOCK_SECTOR_SIZE);
           memcpy (bounce + sector_ofs, buffer + bytes_written, chunk_size);
           cache_write(sector_idx, bounce);
-          //block_write (fs_device, sector_idx, bounce);
+//printf("CACHE_WRITE: %d, %d", bounce);
         }
 
       /* Advance. */
