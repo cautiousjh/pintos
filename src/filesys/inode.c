@@ -391,13 +391,13 @@ inode_extend(struct inode_disk *disk_inode, off_t length)
   //initialization
   num_to_extend = bytes_to_sectors(length) - bytes_to_sectors(disk_inode->length);
   ASSERT(num_to_extend>=0);
-  for(i=0;i<MAX_INDIRECT;i++){
+  for(i=0;i<NUM_INDIRECT_BLOCK;i++){
     indirect_block[i]=NULL_SECTOR;
     double_indirect_block[i]=NULL_SECTOR;
   }
 
   // read direct index
-  for(i=0;i<MAX_DIRECT&&num_to_extend;i++)
+  for(i=0;i<NUM_DIRECT_BLOCK&&num_to_extend;i++)
     if(disk_inode->direct_idx[i] == NULL_SECTOR){
       if(free_map_allocate(1,&disk_inode->direct_idx[i])){ // set sector
         block_write(fs_device, disk_inode->direct_idx[i], &zeros);
