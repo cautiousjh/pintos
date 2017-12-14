@@ -292,8 +292,7 @@ inode_write_at (struct inode *inode, const void *buffer_, off_t size,
     return 0;
 
   if(inode_length(inode) < size+offset)
-    inode_extend(&inode->data, size+offset)
-  
+    inode_extend(&inode->data, size+offset);
   while (size > 0) 
     {
       /* Sector to write, starting byte offset within sector. */
