@@ -89,7 +89,7 @@ filesys_open (const char *name)
     if(!strcmp(filename,"."))
       return (struct file*)dir;
     else if(!strcmp(filename,".."))
-      inode = inode_open(dir->inode->data.dir_parent);
+      inode = inode_open(inode_get_parent(dir_get_inode(dir)));
     else if(strlen(filename))
       dir_lookup(dir,filename,&inode);
     else
@@ -101,7 +101,7 @@ filesys_open (const char *name)
   dir_close(dir);
 
   if(!inode){
-    if(inode->data.dir_parent == -1) // if not directory
+    if(inode_get_parent(inode) == -1) // if not directory
       return file_open(inode);
     else
       return (struct file*) dir_open(inode);
@@ -175,8 +175,8 @@ struct dir* path_parser(char* path, char* filename){
       inode = NULL;
       if(!strcmp(token,"."));
       else if(!strcmp(token,"..")){
-        if (dir->inode->sector != ROOT_DIR_SECTOR){
-          block_sector_t parent_dir = dir->inode->data.dir_parent;
+        if (inode_get_parent(dir_get_inode(dir)) != ROOT_DIR_SECTOR){
+          block_sector_t parent_dir = inode_get_parent(dir_get_inode(dir));
           dir_close(dir);
           inode = inode_open(parent_dir);
           if((dir = dir_open(inode)) == NULL)
@@ -184,7 +184,7 @@ struct dir* path_parser(char* path, char* filename){
         }
       }
       else if(!dir_lookup(dir, token, &inode) || inode == NULL 
-              || inode->data.dir_parent == -1){  //TODO check inode?
+              || inode_get_parent(inode) == -1){  //TODO check inode?
         dir_close(dir);
         inode_close(inode);
         return dir;

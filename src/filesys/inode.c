@@ -424,6 +424,10 @@ inode_length (const struct inode *inode)
   return inode->data.length;
 }
 
+block_sector_t inode_get_parent(struct inode* inode){
+  return inode->data.dir_parent;
+}
+
 bool
 inode_extend(struct inode_disk *disk_inode, off_t length)
 {
