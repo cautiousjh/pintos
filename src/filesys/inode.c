@@ -16,8 +16,6 @@
 #define MAX_INDIRECT (NUM_INDIRECT_BLOCK*BLOCK_SECTOR_SIZE)
 #define NULL_SECTOR -1
 
-bool inode_extend(struct inode_disk *disk_inode, off_t length);
-
 /* On-disk inode.
    Must be exactly BLOCK_SECTOR_SIZE bytes long. */
 struct inode_disk
@@ -102,6 +100,7 @@ inode_init (void)
 bool
 inode_create (block_sector_t sector, off_t length)
 {
+  int i;
   struct inode_disk *disk_inode = NULL;
   bool success = false;
 
@@ -117,10 +116,11 @@ inode_create (block_sector_t sector, off_t length)
       // initialization
       disk_inode->length = 0;
       disk_inode->magic = INODE_MAGIC;
-      for(int i=0;i<MAX_DIRECT;i++)
+      for(i=0;i<MAX_DIRECT;i++)
         disk_inode->direct_idx[i] = NULL_SECTOR;
       disk_inode->indirect_idx = NULL_SECTOR;
       disk_inode->double_indirect_idx = NULL_SECTOR;
+      disk_inode->sector = sector;
       success = inode_extend(disk_inode,length);
       // if success-> block_write block_read data
       free(disk_inode);
@@ -293,6 +293,7 @@ inode_write_at (struct inode *inode, const void *buffer_, off_t size,
 
   if(inode_length(inode) < size+offset)
     inode_extend(&inode->data, size+offset);
+
   while (size > 0) 
     {
       /* Sector to write, starting byte offset within sector. */
@@ -445,7 +446,7 @@ inode_extend(struct inode_disk *disk_inode, off_t length)
   // allocate double indirect index
   for(i=0;i<NUM_INDIRECT_BLOCK && num_to_extend; i++){
     // allocate double indirect
-    flag = false
+    flag = false;
     if(double_indirect_block[i] == NULL_SECTOR){
       if(free_map_allocate(1,&double_indirect_block[i])){
         block_write(fs_device,double_indirect_block[i], &indirect_block);
@@ -488,7 +489,7 @@ inode_extend(struct inode_disk *disk_inode, off_t length)
   }
   // wirte changed double indirect blocks
   if(flag)
-    block_write(fs_device, double_indirect_idx, &double_indirect_block);
+    block_write(fs_device, disk_inode->double_indirect_idx, &double_indirect_block);
 
   // num_to_extend should be 0
   if(i==NUM_INDIRECT_BLOCK && num_to_extend)
