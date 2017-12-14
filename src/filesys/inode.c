@@ -104,7 +104,7 @@ inode_create (block_sector_t sector, off_t length)
 {
   int i;
   //struct inode_disk *disk_inode = NULL;
-  struct inode_disk *disk_inode;
+  struct inode_disk disk_inode;
   bool success = false;
 
   ASSERT (length >= 0);
