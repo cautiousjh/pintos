@@ -119,7 +119,7 @@ inode_create (block_sector_t sector, off_t length)
       disk_inode->start = 0;
       disk_inode->length = 0;
       disk_inode->magic = INODE_MAGIC;
-      for(i=0;i<MAX_DIRECT_BLOCK;i++)
+      for(i=0;i<NUM_DIRECT_BLOCK;i++)
         disk_inode->direct_idx[i] = NULL_SECTOR;
       disk_inode->indirect_idx = NULL_SECTOR;
       disk_inode->double_indirect_idx = NULL_SECTOR;
