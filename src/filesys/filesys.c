@@ -156,10 +156,14 @@ struct dir* path_parser(char* path, char* filename){
       strlcpy(filename, token, strlen(token)+1);
     }
   }
+
   // case: path contains filename only
   if(i==-1){
     strlcpy(filename,path,strlen(path)+1);
-    return NULL;
+    if(!path && !curr_dir)
+      return dir_open_root();
+    else if(!path)
+      return dir_reopen(curr_dir);
   }
 
   // get default directory
