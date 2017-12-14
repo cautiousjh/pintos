@@ -114,7 +114,7 @@ inode_create (block_sector_t sector, off_t length)
   //ASSERT (sizeof *disk_inode == BLOCK_SECTOR_SIZE);
 
   //disk_inode = calloc (1, sizeof *disk_inode);
-  if (disk_inode != NULL)
+  if (1)//disk_inode != NULL)
     {
       // initialization
       disk_inode.length = 0;
