@@ -100,7 +100,7 @@ filesys_open (const char *name)
 
   dir_close(dir);
 
-  if(!inode){
+  if(inode){
     if(inode_get_parent(inode) == -1) // if not directory
       return file_open(inode);
     else
