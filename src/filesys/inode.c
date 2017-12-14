@@ -66,7 +66,7 @@ byte_to_sector (const struct inode *inode, off_t pos)
 
   // direct
   if(pos < MAX_DIRECT)
-    return inode->data.direct_blocks[pos / BLOCK_SECTOR_SIZE];
+    return inode->data.direct_idx[pos / BLOCK_SECTOR_SIZE];
   // indirect
   else if (pos < MAX_DIRECT + MAX_INDIRECT){
     block_read(fs_device, inode->data.indirect_idx, &indirect_block);
@@ -122,7 +122,7 @@ inode_create (block_sector_t sector, off_t length)
         disk_inode->direct_idx[i] = NULL_SECTOR;
       disk_inode->indirect_idx = NULL_SECTOR;
       disk_inode->double_indirect_idx = NULL_SECTOR;
-      disk_inode->sector = sector;
+      disk_inode->start = sector;
       success = inode_extend(disk_inode,length);
       // if success-> block_write block_read data
       free(disk_inode);
@@ -467,11 +467,12 @@ inode_extend(struct inode_disk *disk_inode, off_t length)
     if(double_indirect_block[i] != NULL_SECTOR && num_to_extend )
       block_read(fs_device,double_indirect_block[i], &indirect_block);
     // else, allocate single indirect
-    else if(double_indirect_block[i] == NULL_SECTOR && num_to_extend)
+    else if(double_indirect_block[i] == NULL_SECTOR && num_to_extend){
       if(free_map_allocate(1,&double_indirect_block[i]))
         block_write(fs_device,double_indirect_block[i],&indirect_block);
       else
         return false;
+    }
 
     // allocate single indirects
     for(j=0;j<NUM_INDIRECT_BLOCK && num_to_extend; j++){
