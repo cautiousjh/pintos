@@ -90,7 +90,6 @@ static struct list open_inodes;
 void
 inode_init (void) 
 {
-  cache_init();
   list_init (&open_inodes);
 }
 
