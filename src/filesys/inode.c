@@ -124,8 +124,6 @@ inode_create (block_sector_t sector, off_t length)
       disk_inode->double_indirect_idx = NULL_SECTOR;
       //disk_inode->start = sector;
       success = inode_extend(disk_inode,length);
-      if(success)
-        cache_write(sector, disk_inode);
       free(disk_inode);
     }
   return success;
@@ -542,5 +540,6 @@ inode_extend(struct inode_disk *disk_inode, off_t length)
     return false;
 
   disk_inode->length = length;
+  cache_write(disk_inode->sector, disk_inode);
   return true;
 }
