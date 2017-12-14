@@ -52,7 +52,7 @@ void cache_init(void)
 		lock_init(&cache_array[i].cache_lock);
 		cond_init(&cache_array[i].cache_condvar);
 	}
-	thread_create("bgndWriteBackThread",0,write_back_thread_function,NULL);
+	//thread_create("bgndWriteBackThread",0,write_back_thread_function,NULL);
 }
 
 struct cache_block* get_cache_block(block_sector_t sector)
