@@ -160,9 +160,9 @@ struct dir* path_parser(char* path, char* filename){
   // case: path contains filename only
   if(i==-1){
     strlcpy(filename,path,strlen(path)+1);
-    if(!path && !curr_dir)
+    if(!curr_dir)
       return dir_open_root();
-    else if(!path)
+    else
       return dir_reopen(curr_dir);
   }
 
