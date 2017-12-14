@@ -30,6 +30,8 @@ struct inode_disk
     block_sector_t double_indirect_idx;
   };
 
+bool inode_extend(struct inode_disk *disk_inode, off_t length)
+
 /* Returns the number of sectors to allocate for an inode SIZE
    bytes long. */
 static inline size_t
