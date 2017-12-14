@@ -23,11 +23,11 @@ struct inode_disk
     block_sector_t start;               /* First data sector. */
     off_t length;                       /* File size in bytes. */
     unsigned magic;                     /* Magic number. */
-    uint32_t unused[113];               /* Not used. */
 
     block_sector_t direct_idx[NUM_DIRECT_BLOCK];
     block_sector_t indirect_idx;
     block_sector_t double_indirect_idx;
+    uint32_t unused[113];               /* Not used. */
   };
 
 bool inode_extend(struct inode_disk *disk_inode, off_t length);
