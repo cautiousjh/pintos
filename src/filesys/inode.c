@@ -103,32 +103,31 @@ bool
 inode_create (block_sector_t sector, off_t length)
 {
   int i;
-  //struct inode_disk *disk_inode = NULL;
-  struct inode_disk disk_inode;
+  struct inode_disk *disk_inode = NULL;
   bool success = false;
 
   ASSERT (length >= 0);
 
   /* If this assertion fails, the inode structure is not exactly
      one sector in size, and you should fix that. */
-  //ASSERT (sizeof *disk_inode == BLOCK_SECTOR_SIZE);
+  ASSERT (sizeof *disk_inode == BLOCK_SECTOR_SIZE);
 
   //disk_inode = calloc (1, sizeof *disk_inode);
-  if (1)//disk_inode != NULL)
+  if (disk_inode != NULL)
     {
       // initialization
-      disk_inode.start = 0;
-      disk_inode.length = 0;
-      disk_inode.magic = INODE_MAGIC;
+      disk_inode->start = 0;
+      disk_inode->length = 0;
+      disk_inode->magic = INODE_MAGIC;
       for(i=0;i<MAX_DIRECT_BLOCK;i++)
-        disk_inode.direct_idx[i] = NULL_SECTOR;
-      disk_inode.indirect_idx = NULL_SECTOR;
-      disk_inode.double_indirect_idx = NULL_SECTOR;
+        disk_inode->direct_idx[i] = NULL_SECTOR;
+      disk_inode->indirect_idx = NULL_SECTOR;
+      disk_inode->double_indirect_idx = NULL_SECTOR;
       //disk_inode->start = sector;
-      success = inode_extend(&disk_inode,length);
+      success = inode_extend(disk_inode,length);
       if(success)
-        block_write(fs_device,sector, &disk_inode);
-      //free(disk_inode);
+        block_write(fs_device,sector, disk_inode);
+      free(disk_inode);
     }
   return success;
 }
