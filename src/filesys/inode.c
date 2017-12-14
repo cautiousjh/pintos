@@ -75,7 +75,7 @@ byte_to_sector (const struct inode *inode, off_t pos)
   // double indirect
   else{
     cache_read(inode->data.double_indirect_idx, &indirect_block);
-    cache_read(fs_device, 
+    cache_read(
       double_indirect_block[(pos/BLOCK_SECTOR_SIZE-MAX_DIRECT-MAX_INDIRECT)/NUM_INDIRECT_BLOCK], 
       &double_indirect_block);
     return double_indirect_block[(pos/BLOCK_SECTOR_SIZE-MAX_DIRECT-MAX_INDIRECT)%NUM_INDIRECT_BLOCK];
