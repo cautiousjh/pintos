@@ -10,7 +10,7 @@
 
 /* Identifies an inode. */
 #define INODE_MAGIC 0x494e4f44
-#define NUM_DIRECT_BLOCK 100
+#define NUM_DIRECT_BLOCK 10
 #define NUM_INDIRECT_BLOCK (BLOCK_SECTOR_SIZE / 4)
 #define MAX_DIRECT (NUM_DIRECT_BLOCK*BLOCK_SECTOR_SIZE)
 #define MAX_INDIRECT (NUM_INDIRECT_BLOCK*BLOCK_SECTOR_SIZE)
@@ -74,11 +74,11 @@ byte_to_sector (const struct inode *inode, off_t pos)
   }
   // double indirect
   else{
-    cache_read(inode->data.double_indirect_idx, &indirect_block);
+    cache_read(inode->data.double_indirect_idx, &double_indirect_block);
     cache_read(
       double_indirect_block[(pos/BLOCK_SECTOR_SIZE-MAX_DIRECT-MAX_INDIRECT)/NUM_INDIRECT_BLOCK], 
-      &double_indirect_block);
-    return double_indirect_block[(pos/BLOCK_SECTOR_SIZE-MAX_DIRECT-MAX_INDIRECT)%NUM_INDIRECT_BLOCK];
+      &indirect_block);
+    return indirect_block[(pos/BLOCK_SECTOR_SIZE-MAX_DIRECT-MAX_INDIRECT)%NUM_INDIRECT_BLOCK];
   }
 }
 
