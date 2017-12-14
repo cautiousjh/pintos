@@ -10,7 +10,7 @@
 
 /* Identifies an inode. */
 #define INODE_MAGIC 0x494e4f44
-#define NUM_DIRECT_BLOCK 10
+#define NUM_DIRECT_BLOCK 100
 #define NUM_INDIRECT_BLOCK (BLOCK_SECTOR_SIZE / 4)
 #define MAX_DIRECT (NUM_DIRECT_BLOCK*BLOCK_SECTOR_SIZE)
 #define MAX_INDIRECT (NUM_INDIRECT_BLOCK*BLOCK_SECTOR_SIZE)
@@ -24,10 +24,12 @@ struct inode_disk
     off_t length;                       /* File size in bytes. */
     unsigned magic;                     /* Magic number. */
 
+    block_sector_t dir_parent;
+
     block_sector_t direct_idx[NUM_DIRECT_BLOCK];
     block_sector_t indirect_idx;
     block_sector_t double_indirect_idx;
-    uint32_t unused[113-NUM_DIRECT_BLOCK+10];               /* Not used. */
+    uint32_t unused[112-NUM_DIRECT_BLOCK+10];               /* Not used. */
   };
 
 bool inode_extend(struct inode_disk *disk_inode, off_t length);
@@ -99,7 +101,7 @@ inode_init (void)
    Returns true if successful.
    Returns false if memory or disk allocation fails. */
 bool
-inode_create (block_sector_t sector, off_t length)
+inode_create (block_sector_t sector, off_t length, block_sector_t dir_parent)
 {
   int i;
   struct inode_disk *disk_inode = NULL;
@@ -122,6 +124,7 @@ inode_create (block_sector_t sector, off_t length)
         disk_inode->direct_idx[i] = NULL_SECTOR;
       disk_inode->indirect_idx = NULL_SECTOR;
       disk_inode->double_indirect_idx = NULL_SECTOR;
+      disk_inode->dir_parent = dir_parent;
       //disk_inode->start = sector;
       success = inode_extend(disk_inode,length);
       if(success)

@@ -497,6 +497,11 @@ init_thread (struct thread *t, const char *name, int priority)
   t->stack = (uint8_t *) t + PGSIZE;
   t->priority = priority;
   t->magic = THREAD_MAGIC;
+
+  // set directory
+  if(strcmp(name,"idle")&&strcmp(name,"main")&&strcmp(name,"bgndWriteBackThread"))
+    t->dir_current = dir_reopen(thread_current()->dir_current);
+
   list_push_back (&all_list, &t->allelem);
 }
 

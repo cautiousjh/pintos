@@ -2,6 +2,7 @@
 #include <debug.h>
 #include <stdio.h>
 #include <string.h>
+#include "threads/thread.h"
 #include "filesys/file.h"
 #include "filesys/free-map.h"
 #include "filesys/inode.h"
@@ -30,6 +31,7 @@ filesys_init (bool format)
     do_format ();
 
   free_map_open ();
+  thread_current()->dir_current = dir_open_root();
 }
 
 /* Shuts down the file system module, writing any unwritten data
@@ -48,11 +50,16 @@ bool
 filesys_create (const char *name, off_t initial_size) 
 {
   block_sector_t inode_sector = 0;
-  struct dir *dir = dir_open_root ();
+  char filename[512]={0};
+  struct dir *dir;
+
+  // set filename and directory
+  dir = path_parser(name,filename);
+
   bool success = (dir != NULL
                   && free_map_allocate (1, &inode_sector)
-                  && inode_create (inode_sector, initial_size)
-                  && dir_add (dir, name, inode_sector));
+                  && inode_create (inode_sector, initial_size, -1)
+                  && dir_add (dir, filename, inode_sector));
   if (!success && inode_sector != 0) 
     free_map_release (inode_sector, 1);
   dir_close (dir);
@@ -69,14 +76,36 @@ filesys_create (const char *name, off_t initial_size)
 struct file *
 filesys_open (const char *name)
 {
-  struct dir *dir = dir_open_root ();
   struct inode *inode = NULL;
+  char filename[512]={0};
+  struct dir *dir;
 
-  if (dir != NULL)
-    dir_lookup (dir, name, &inode);
-  dir_close (dir);
+  // set filename and directory
+  dir = path_parser(name,filename);
 
-  return file_open (inode);
+  if(dir != NULL){
+    if(!strcmp(filename,"."))
+      return (struct file*)dir;
+    else if(!strcmp(filename,".."))
+      inode = inode_open(dir->inode->data.dir_parent);
+    else if(strlen(filename))
+      dir_lookup(dir,filename,&inode);
+    else
+      return (struct file*)dir;
+  }
+  else
+    return NULL;
+
+  dir_close(dir);
+
+  if(!inode){
+    if(inode->data.dir_parent == -1) // if not directory
+      return file_open(inode);
+    else
+      return (struct file*) dir_open(inode);
+  }
+  else
+    return NULL;
 }
 
 /* Deletes the file named NAME.
@@ -86,8 +115,13 @@ filesys_open (const char *name)
 bool
 filesys_remove (const char *name) 
 {
-  struct dir *dir = dir_open_root ();
-  bool success = dir != NULL && dir_remove (dir, name);
+  struct dir *dir;
+  char filename[512]={0};
+  bool success;
+
+  dir = path_parser(name,filename);
+
+  success =  dir != NULL && dir_remove (dir, filename);
   dir_close (dir); 
 
   return success;
@@ -104,3 +138,64 @@ do_format (void)
   free_map_close ();
   printf ("done.\n");
 }
+
+struct dir* path_parser(char* path, char* filename){
+  struct dir *dir;
+  struct dir *curr_dir = thread_current()->dir_current;
+  struct inode *inode;
+  int i=-1,cnt;
+  char *token, *save_ptr;
+
+  // get filename
+  for(i=strlen(path);i>=0;i--){
+    if(path[i]=='/'){
+      path[i] = '\0';
+      token = path[i+1];
+      strlcpy(filename, token, strlen(token));
+    }
+  }
+  // case: path contains filename only
+  if(i==-1){
+    strlcpy(filename,path,strlen(path));
+    return NULL;
+  }
+
+  // get default directory
+  if(path[0]=='/')
+    dir = dir_open_root();
+  else
+    dir = dir_reopen(curr_dir);
+
+  // dir parsing
+  token = strtok_r(path,"/",&save_ptr);
+  while(token){
+    if(strlen(token)){
+      inode = NULL;
+      if(!strcmp(token,"."));
+      else if(!strcmp(token,"..")){
+        if (dir->inode->sector != ROOT_DIR_SECTOR){
+          block_sector_t parent_dir = dir->inode->data.dir_parent;
+          dir_close(dir);
+          inode = inode_open(parent_dir);
+          if((dir = dir_open(inode)) == NULL)
+            inode_close(inode);
+        }
+      }
+      else if(!dir_lookup(dir, token, &inode) || inode == NULL 
+              || inode->data.dir_parent == -1){  //TODO check inode?
+        dir_close(dir);
+        inode_close(inode);
+        return dir;
+      }
+      else{
+        dir_close(dir);
+        dir = dir_open(inode);
+      }
+    }
+    if(dir == NULL)
+      return dir;
+    token = strtok_r(NULL,"/",&save_ptr);
+  }
+  return dir;
+}
+

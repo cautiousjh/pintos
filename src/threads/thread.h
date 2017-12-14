@@ -106,6 +106,7 @@ struct thread
 
     /* Shared between thread.c and synch.c. */
     struct list_elem elem;              /* List element. */
+    struct dir* dir_current;
 
 #ifdef USERPROG
     /* Owned by userprog/process.c. */
@@ -121,6 +122,7 @@ struct thread
     
     struct list_elem sleepElem;
     int64_t wakeup_time;
+
 #endif
 
     /* Owned by thread.c. */
