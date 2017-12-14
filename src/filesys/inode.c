@@ -448,9 +448,9 @@ inode_extend(struct inode_disk *disk_inode, off_t length)
   }
 
   // allocate double indirect index
+  flag = false;
   for(i=0;i<NUM_INDIRECT_BLOCK && num_to_extend; i++){
     // allocate double indirect
-    flag = false;
     if(double_indirect_block[i] == NULL_SECTOR){
       if(free_map_allocate(1,&double_indirect_block[i])){
         block_write(fs_device,double_indirect_block[i], &indirect_block);
