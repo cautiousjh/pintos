@@ -209,8 +209,10 @@ syscall_open(const char* name)
 	inode = file_get_inode(open_file);
 	if(inode_get_parent(inode) != -1){	// if directory
 		if(dir_current && 
-			inode_get_inumber(dir_get_inode(dir_current)) == inode_get_inumber(inode))
-			dir = dir_current;//dir_reopen(dir_current);
+			inode_get_inumber(dir_get_inode(dir_current)) == inode_get_inumber(inode)){
+			dir_close(dir);
+			dir = dir_reopen(dir_current);
+		}
 		else
 			dir = dir_open(file_get_inode(open_file));
 		felem->this_dir = dir;
