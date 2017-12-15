@@ -312,7 +312,7 @@ bool close_file(int fd)
 		if(felem->fd == fd){
 			// TODOOTODOTODOTODOTODOTOOTODOTOD
 			if (felem->this_dir)
-				dir_close(felem->this_dir)
+				dir_close(felem->this_dir);
 			else
 				file_close(felem->this_file);
 			list_remove(iter);
@@ -340,7 +340,7 @@ void close_all_file(struct list* fd_list)
 		felem = list_entry(iter, struct file_elem, elem);
 			// TODOOTODOTODOTODOTODOTOOTODOTOD
 		if (felem->this_dir)
-			dir_close(felem->this_dir)
+			dir_close(felem->this_dir);
 		else
 			file_close(felem->this_file);
 		list_remove(iter);
