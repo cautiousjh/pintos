@@ -243,6 +243,7 @@ struct dir* dir_chdir(char* path){
   struct dir *dir = path_parser(path, name);
 
   if(!strcmp(name,"..")){
+    printf("FROM HERE");
     inode = inode_open(inode_get_parent(dir_get_inode(dir)));
     dir_close(dir);
     if(inode)
