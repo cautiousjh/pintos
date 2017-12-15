@@ -151,6 +151,7 @@ struct dir* path_parser(char* path, char* filename){
   struct dir *dir;
   struct dir *curr_dir = thread_current()->dir_current;
   struct inode *inode;
+  char new_path[512];
   int i=-1,cnt;
   char *token, *save_ptr;
 
@@ -159,9 +160,10 @@ struct dir* path_parser(char* path, char* filename){
   // get filename
   for(i=strlen(path);i>=0;i--){
     if(path[i]=='/'){
-      path[i] = 0;
       token = path[i+1];
       strlcpy(filename, token, strlen(token)+1);
+      strlcpy(new_path,path,i);
+      new_path[i] = 0;
     }
   }
 
@@ -175,13 +177,13 @@ struct dir* path_parser(char* path, char* filename){
   }
 
   // get default directory
-  if(path[0]=='/')
+  if(new_path[0]=='/')
     dir = dir_open_root();
   else
     dir = dir_reopen(curr_dir);
 
   // dir parsing
-  token = strtok_r(path,"/",&save_ptr);
+  token = strtok_r(new_path,"/",&save_ptr);
   while(token){
     if(strlen(token)){
       inode = NULL;
