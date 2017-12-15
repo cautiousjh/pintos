@@ -151,7 +151,7 @@ struct dir* path_parser(char* path, char* filename){
   struct dir *dir;
   struct dir *curr_dir = thread_current()->dir_current;
   struct inode *inode;
-  char new_path[512];
+  char new_path[512]={0};
   int i=-1,cnt;
   char *token, *save_ptr;
 
@@ -162,8 +162,8 @@ struct dir* path_parser(char* path, char* filename){
     if(path[i]=='/'){
       token = path+i+1;
       strlcpy(filename, token, strlen(token)+1);
-      strlcpy(new_path,path,i);
-      new_path[i] = 0;
+      strlcpy(new_path,path,i+1);
+      new_path[i+1] = 0;
       break;
     }
   }
