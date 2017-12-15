@@ -134,7 +134,7 @@ filesys_remove (const char *name)
   // TODOTOODOTOODOTODOOTOOTOTOTOTODOODOTODOO YAME
   success =  dir != NULL && strcmp(filename, "..") &&
              strcmp(filename, ".") && dir_remove (dir, filename);
-  dir_close (dir); 
+  //dir_close (dir); 
 
   return success;
 }
