@@ -83,10 +83,10 @@ syscall_handler (struct intr_frame *f UNUSED)
      	f->eax = syscall_chdir(*((char**)(f->esp)+1));
      	break;
      case SYS_MKDIR:
-     	f->eax = syscall_mkdir(*((char*)(f->esp)+1));
+     	f->eax = syscall_mkdir(*((char**)(f->esp)+1));
      	break;
     case SYS_READDIR:
-    	f->eax = syscall_readdir(*((char*)(f->esp)+1),*((int*)(f->esp)+2));
+    	f->eax = syscall_readdir(*((char**)(f->esp)+1),*((int*)(f->esp)+2));
     	break;
     case SYS_ISDIR:
     	f->eax = syscall_isdir(*((int*)(f->esp)+1));
