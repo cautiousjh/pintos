@@ -3,7 +3,7 @@
 
 #include "threads/thread.h"
 #include "threads/malloc.h"
-#include "userprog/directory.h"
+#include "filesys/directory.h"
 
 struct file_elem
 {
