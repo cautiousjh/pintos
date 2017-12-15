@@ -202,6 +202,7 @@ struct dir* path_parser(char* path, char* filename){
               || inode_get_parent(inode) == -1){  //TODO check inode?
         dir_close(dir);
         inode_close(inode);
+        // TODOODOOTODOODOTOODODOOTODODOOTOODODO
         return NULL;
       }
       else{
