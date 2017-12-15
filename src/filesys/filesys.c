@@ -94,8 +94,17 @@ filesys_open (const char *name)
   dir = path_parser(name,filename);
 
   if(dir != NULL){
-    if(!strcmp(filename,"."))
-      return (struct file*)dir;
+    if(!strcmp(filename,".")){
+      if(dir_lookup(dir,name,&inode)){
+        dir_close(dir);
+        dir = dir_open(inode);
+        return (struct file*)dir;
+      }
+      else{
+        dir_close(dir);
+        return NULL;
+      }
+    }
     else if(!strcmp(filename,".."))
       inode = inode_open(inode_get_parent(dir_get_inode(dir)));
     else if(strlen(filename))
