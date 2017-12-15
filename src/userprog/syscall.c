@@ -10,6 +10,7 @@
 #include "filesys/file.h"
 #include "filesys/filesys.h"
 #include "filesys/directory.h"
+#include "filesys/inode.h"
 #include "devices/shutdown.h"
 
 #define ASSERT_EXIT( COND ) { if(!(COND)) syscall_exit(-1); }
@@ -173,7 +174,7 @@ bool
 syscall_create(const char* name, unsigned size)
 {
 	ASSERT_EXIT(name);
-	return filesys_create(name, size);
+	return filesys_create(name, size, false);
 }
 
 bool 
