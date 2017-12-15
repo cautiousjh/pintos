@@ -276,7 +276,8 @@ syscall_close(int fd)
 		return;
 	if(syscall_isdir(fd))
 		dir_close(get_file_elem(fd)->this_dir);
-	ASSERT_EXIT(close_file(fd));
+	else
+		ASSERT_EXIT(close_file(fd));
 }
 
 
