@@ -238,9 +238,9 @@ dir_remove (struct dir *dir, const char *name)
 }
 
 struct dir* dir_chdir(char* path){
+  struct inode *inode;
   char name[512] = {0};
   struct dir *dir = path_parser(path, name);
-  struct inode *inode;
 
   if(!strcmp(name,"..")){
     inode = inode_open(inode_get_parent(dir_get_inode(dir)));
@@ -250,7 +250,7 @@ struct dir* dir_chdir(char* path){
     else
       return NULL;
   }
-  else if(!strcmp(name,".") || strlen(name)){
+  else if(strlen(name) && strcmp(name,".")){
     if(dir_lookup(dir,name,&inode)){
       dir_close(dir);
       dir = dir_open(inode);
