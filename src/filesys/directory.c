@@ -230,7 +230,7 @@ struct dir* dir_chdir(char* path){
       return NULL;
     }
   }
-  else if(!strcmp(filename,"..")){
+  else if(!strcmp(name,"..")){
     inode = inode_open(inode_get_parent(dir_get_inode(dir)));
     dir_close(dir);
     if(inode)

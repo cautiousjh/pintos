@@ -14,8 +14,6 @@ struct block *fs_device;
 
 static void do_format (void);
 
-struct dir* path_parser(char* path, char* filename);
-
 /* Initializes the file system module.
    If FORMAT is true, reformats the file system. */
 void
@@ -129,7 +127,7 @@ filesys_remove (const char *name)
   char filename[512]={0};
   bool success;
 
-  dir = path_parser(name,filename);
+  dir = path_parser(name, filename);
 
   success =  dir != NULL && dir_remove (dir, filename);
   dir_close (dir); 
