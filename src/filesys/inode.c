@@ -150,8 +150,9 @@ inode_open (block_sector_t sector)
       inode = list_entry (e, struct inode, elem);
       if (inode->sector == sector) 
         {
-          printf("INODE REOPEN\n");
+          printf("INODE REOPEN");
           inode_reopen (inode);
+          printf(": %d\n", inode_get_open_cnt(inode));
           return inode; 
         }
     }
