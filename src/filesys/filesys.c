@@ -164,6 +164,7 @@ struct dir* path_parser(char* path, char* filename){
       strlcpy(filename, token, strlen(token)+1);
       strlcpy(new_path,path,i);
       new_path[i] = 0;
+      break;
     }
   }
 
