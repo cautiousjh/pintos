@@ -88,6 +88,8 @@ filesys_open (const char *name)
   char filename[512]={0};
   struct dir *dir;
 
+  // TOODOOTODOTODOOTOOTODOOTODOTODOTOOTDO
+  if (strlen(name) == 0) return NULL;
   // set filename and directory
   dir = path_parser(name,filename);
 
@@ -129,7 +131,8 @@ filesys_remove (const char *name)
 
   dir = path_parser(name, filename);
 
-  success =  dir != NULL && dir_remove (dir, filename);
+  // TODOTOODOTOODOTODOOTOOTOTOTOTODOODOTODOO YAME
+  success =  dir != NULL && strcmp(filename, "..") && strcmp(filename, ".") && dir_remove (dir, filename);
   dir_close (dir); 
 
   return success;

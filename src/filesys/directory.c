@@ -203,6 +203,12 @@ dir_remove (struct dir *dir, const char *name)
 
   // is directory?
   if(inode_get_parent(inode) != -1){
+    // TODOTODOTODOTODTODOTODO
+    struct dir* curr = thread_current()->dir_current;
+    if (curr != NULL &&
+          inode_get_inumber(inode) == inode_get_inumber(curr->inode))
+      goto done;
+
     // TODO check wheter empty or not
     if(inode_get_open_cnt(inode) > 1)
       goto done;
