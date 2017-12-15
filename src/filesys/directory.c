@@ -41,7 +41,7 @@ dir_open (struct inode *inode)
       dir->inode = inode;
       dir->pos = 0;
 
-printf("OPEN: %d\n",inode_get_open_cnt(dir_get_inode(dir)));
+printf("OPEN: %d from %d\n",inode_get_open_cnt(dir_get_inode(dir)), inode);
       return dir;
     }
   else
@@ -262,7 +262,6 @@ struct dir* dir_chdir(char* path){
       return NULL;
     }
   }
-printf("CHDIR: %d\n",inode_get_open_cnt(dir_get_inode(dir)));
   return dir;
 }
 
