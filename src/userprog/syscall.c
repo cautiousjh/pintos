@@ -207,7 +207,7 @@ syscall_open(const char* name)
 	felem->this_file = open_file;
 
 	inode = file_get_inode(open_file);
-	if(inode->data.parent_dir != -1){	// if directory
+	if(inode_get_parent(inode) != -1){	// if directory
 		if(dir_current && 
 			inode_get_inumber(dir_current->inode) == inode_get_inumber(inode))
 			dir = dir_reopen(dir_current);
