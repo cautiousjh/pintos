@@ -19,6 +19,7 @@ off_t inode_read_at (struct inode *, void *, off_t size, off_t offset);
 off_t inode_write_at (struct inode *, const void *, off_t size, off_t offset);
 void inode_deny_write (struct inode *);
 void inode_allow_write (struct inode *);
+int inode_get_open_cnt(struct inode* inode);
 off_t inode_length (const struct inode *);
 
 

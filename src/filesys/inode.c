@@ -428,6 +428,10 @@ block_sector_t inode_get_parent(struct inode* inode){
   return inode->data.dir_parent;
 }
 
+int inode_get_open_cnt(struct inode* inode){
+  return inode->open_cnt;
+}
+
 bool
 inode_extend(struct inode_disk *disk_inode, off_t length)
 {
