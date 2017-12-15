@@ -154,6 +154,8 @@ struct dir* path_parser(char* path, char* filename){
   int i=-1,cnt;
   char *token, *save_ptr;
 
+  if(!path)
+    return NULL;
   // get filename
   for(i=strlen(path);i>=0;i--){
     if(path[i]=='/'){
