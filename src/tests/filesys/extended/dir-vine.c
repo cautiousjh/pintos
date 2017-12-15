@@ -70,7 +70,7 @@ test_main (void)
   quiet = false;
 
   msg ("removing all but top 10 levels of files and directories...");
-  quiet = true;
+  //quiet = true;
   while (i-- > 10) 
     {
       char file_name[16], dir_name[16];
