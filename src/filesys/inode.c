@@ -150,6 +150,7 @@ inode_open (block_sector_t sector)
       inode = list_entry (e, struct inode, elem);
       if (inode->sector == sector) 
         {
+          printf("INODE REOPEN\n");
           inode_reopen (inode);
           return inode; 
         }
