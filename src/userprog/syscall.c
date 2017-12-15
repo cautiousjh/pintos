@@ -9,6 +9,7 @@
 #include "threads/vaddr.h"
 #include "filesys/file.h"
 #include "filesys/filesys.h"
+#include "filesys/directory.h"
 #include "devices/shutdown.h"
 
 #define ASSERT_EXIT( COND ) { if(!(COND)) syscall_exit(-1); }
@@ -75,11 +76,62 @@ syscall_handler (struct intr_frame *f UNUSED)
     	f->eax = syscall_tell(*((char**)(f->esp)+1)); 
      	break;
     case SYS_CLOSE:
-    	syscall_close(*((char**)(f->esp)+1)); 
+    	syscall_close(*((const char**)(f->esp)+1)); 
      	break;
+     case SYS_CHDIR:
+     	f->eax = syscall_chdir(*((char**)(f->esp)+1));
+     	break;
+     case SYS_MKDIR:
+     	f->eax = syscall_mkdir(*((char*)(f->esp)+1));
+     	break;
+    case SYS_READDIR:
+    	f->eax = syscall_readdir(*((char*)(f->esp)+1),*((int*)(f->esp)+2));
+    	break;
+    case SYS_ISDIR:
+    	f->eax = syscall_isdir(*((int*)(f->esp)+1));
+    	break;
+    case SYS_INUMBER:
+    	f->eax = syscall_inumber(*((int*)(f->esp)+1));
+    	break;
     default: break;
   }
 }
+
+bool syscall_chdir(const char* path){
+	struct thread *t = thread_current();
+	struct dir *dir = dir_chdir(path);
+	if(dir){
+		dir_close(t->dir_current);
+		t->dir_current = dir;
+		return true;
+	}
+	else
+		return false;
+}
+bool syscall_mkdir(const char* dir){
+	return filesys_create(dir,0,true);	//TODO filesys create
+}
+bool syscall_readdir(int fd, char *name){
+	ASSERT_EXIT(get_file_elem(fd)->this_file);
+	struct file_elem* felem = get_file_elem(fd);
+	if(!felem || felem->this_dir == NULL)
+		return false;
+	else 
+		return dir_readdir(felem->this_dir, name);
+}
+bool syscall_isdir(int fd){
+	ASSERT_EXIT(get_file_elem(fd)->this_file);
+	return get_file_elem(fd)->this_dir != NULL;
+}
+int syscall_inumber(int fd){
+	ASSERT_EXIT(get_file_elem(fd)->this_file);
+	struct file_elem* felem = get_file_elem(fd);
+	if(felem->this_dir)
+		return inode_get_inumber(dir_get_inode(felem->this_dir));
+	else
+		return inode_get_inumber(file_get_inode(felem->this_file));
+}
+
 
 void 
 syscall_exit(int status)
@@ -136,6 +188,9 @@ syscall_open(const char* name)
 {
 	struct file* open_file;
 	struct file_elem* felem;
+	struct inode* inode;
+	struct dir* dir;
+	struct dir* dir_current = thread_current()->dir_current;
 
 	ASSERT_EXIT(name);
 	
@@ -147,7 +202,18 @@ syscall_open(const char* name)
 	//add file to thread
 	felem = malloc(sizeof(struct file_elem));
 	felem->fd = set_new_fd();
+	felem->this_dir = NULL;
 	felem->this_file = open_file;
+
+	inode = file_get_inode(open_file);
+	if(inode->data.parent_dir != -1){	// if directory
+		if(dir_current && 
+			inode_get_inumber(dir_current->inode) == inode_get_inumber(inode))
+			dir = dir_reopen(dir_current);
+		else
+			dir = dir_open(file_get_inode(open_file));
+		felem->this_dir = dir;
+	}
 	list_push_back(&thread_current()->fd_list, &felem->elem);
 
 	return felem->fd;
@@ -207,6 +273,8 @@ syscall_close(int fd)
 	ASSERT_EXIT(get_file_elem(fd)->this_file);
 	if(fd == STDOUT_FILENO || fd == STDIN_FILENO)
 		return;
+	if(syscall_isdir(fd))
+		dir_close(get_file_elem(fd)->this_dir);
 	ASSERT_EXIT(close_file(fd));
 }
 

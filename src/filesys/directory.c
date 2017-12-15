@@ -215,6 +215,33 @@ dir_remove (struct dir *dir, const char *name)
   return success;
 }
 
+struct dir* dir_chdir(char* path){
+  char name[512] = {0};
+  struct dir *dir = path_parser(path, name);
+  struct inode *inode;
+
+  if(!strcmp(name,".") && strlen(name)){
+    if(dir_lookup(dir,name,&inode)){
+      dir_close(dir);
+      dir = dir_open(inode);
+    }
+    else{
+      dir_close(dir);
+      return NULL;
+    }
+  }
+  else if(!strcmp(filename,"..")){
+    inode = inode_open(inode_get_parent(dir_get_inode(dir)));
+    dir_close(dir);
+    if(inode)
+      dir = dir_open(inode);
+    else
+      return NULL;
+  }
+  return dir;
+}
+
+
 /* Reads the next directory entry in DIR and stores the name in
    NAME.  Returns true if successful, false if the directory
    contains no more entries. */

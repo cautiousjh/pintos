@@ -3,11 +3,13 @@
 
 #include "threads/thread.h"
 #include "threads/malloc.h"
+#include "userprog/directory.h"
 
 struct file_elem
 {
 	int fd;
 	struct file* this_file;
+	struct dir* this_dir;
 	struct list_elem elem;
 };
 
