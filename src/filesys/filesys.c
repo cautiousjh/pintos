@@ -135,6 +135,7 @@ filesys_remove (const char *name)
   success =  dir != NULL && strcmp(filename, "..") &&
              strcmp(filename, ".") && dir_remove (dir, filename);
   dir_close (dir); 
+  printf ("REMOVED: %d",inode_get_open_cnt(dir_get_inode(dir)));
 
   return success;
 }
