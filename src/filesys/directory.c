@@ -242,7 +242,15 @@ struct dir* dir_chdir(char* path){
   struct dir *dir = path_parser(path, name);
   struct inode *inode;
 
-  if(!strcmp(name,".") || strlen(name)){
+  if(!strcmp(name,"..")){
+    inode = inode_open(inode_get_parent(dir_get_inode(dir)));
+    dir_close(dir);
+    if(inode)
+      dir = dir_open(inode);
+    else
+      return NULL;
+  }
+  else if(!strcmp(name,".") || strlen(name)){
     if(dir_lookup(dir,name,&inode)){
       dir_close(dir);
       dir = dir_open(inode);
@@ -251,14 +259,6 @@ struct dir* dir_chdir(char* path){
       dir_close(dir);
       return NULL;
     }
-  }
-  else if(!strcmp(name,"..")){
-    inode = inode_open(inode_get_parent(dir_get_inode(dir)));
-    dir_close(dir);
-    if(inode)
-      dir = dir_open(inode);
-    else
-      return NULL;
   }
   return dir;
 }
