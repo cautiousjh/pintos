@@ -220,7 +220,7 @@ struct dir* dir_chdir(char* path){
   struct dir *dir = path_parser(path, name);
   struct inode *inode;
 
-  if(!strcmp(name,".") && strlen(name)){
+  if(!strcmp(name,".") || strlen(name)){
     if(dir_lookup(dir,name,&inode)){
       dir_close(dir);
       dir = dir_open(inode);
