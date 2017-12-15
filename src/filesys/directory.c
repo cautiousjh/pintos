@@ -185,10 +185,10 @@ dir_add (struct dir *dir, const char *name, block_sector_t inode_sector)
 bool
 dir_remove (struct dir *dir, const char *name) 
 {
-  struct dir_entry e;
+  struct dir_entry e, tmp_e;
   struct inode *inode = NULL;
   bool success = false;
-  off_t ofs;
+  off_t ofs, tmp_ofs;
 
   ASSERT (dir != NULL);
   ASSERT (name != NULL);
@@ -210,7 +210,15 @@ dir_remove (struct dir *dir, const char *name)
           inode_get_inumber(inode) == inode_get_inumber(curr->inode))
       goto done;
 
-    // TODO check wheter empty or not
+    // is empty dir
+    tmp_ofs = 0;
+    while(inode_read_at(inode,&tmp_e, sizeof tmp_e, tmp_ofs) == sizeof tmp_e){
+      tmp_ofs += sizeof tmp_e;
+      if(tmp_e.in_use)
+        goto done;
+    }
+
+    // open cnt
     if(inode_get_open_cnt(inode) > 1)
       goto done;
   }
