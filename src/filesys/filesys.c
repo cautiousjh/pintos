@@ -159,7 +159,7 @@ struct dir* path_parser(char* path, char* filename){
   // get filename
   for(i=strlen(path);i>=0;i--){
     if(path[i]=='/'){
-      path[i] = '\0';
+      path[i] = 0;
       token = path[i+1];
       strlcpy(filename, token, strlen(token)+1);
     }
