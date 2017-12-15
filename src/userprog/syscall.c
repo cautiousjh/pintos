@@ -310,7 +310,11 @@ bool close_file(int fd)
 		iter = iter->next){
 		felem = list_entry(iter, struct file_elem, elem);
 		if(felem->fd == fd){
-			file_close(felem->this_file);
+			// TODOOTODOTODOTODOTODOTOOTODOTOD
+			if (felem->this_dir)
+				dir_close(felem->this_dir)
+			else
+				file_close(felem->this_file);
 			list_remove(iter);
 			free(felem);
 			return true;
@@ -334,7 +338,11 @@ void close_all_file(struct list* fd_list)
 		iter = next){
 		next = iter->next;
 		felem = list_entry(iter, struct file_elem, elem);
-		file_close(felem->this_file);
+			// TODOOTODOTODOTODOTODOTOOTODOTOD
+		if (felem->this_dir)
+			dir_close(felem->this_dir)
+		else
+			file_close(felem->this_file);
 		list_remove(iter);
 		free(felem);
 	}
